@@ -5,97 +5,122 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AV Rental Shimla</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <style>
         /* Global Styles */
-        body {
-            font-family: 'Roboto', sans-serif;
+        :root {
+            --navy: #1A2526;
+            --white: #FFFFFF;
+            --gold: #D4A017;
+            --light-gray: #F5F5F5;
+        }
+
+        * {
             margin: 0;
             padding: 0;
-            color: #333;
-            background-color: #fff;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            color: var(--navy);
+            background-color: var(--white);
             scroll-behavior: smooth;
+            line-height: 1.6;
         }
 
         a {
             text-decoration: none;
+            color: inherit;
         }
 
         .btn {
-            background-color: #007BFF;
-            color: #fff;
-            padding: 12px 24px;
-            border-radius: 5px;
+            background-color: var(--gold);
+            color: var(--navy);
+            padding: 14px 28px;
+            border-radius: 50px;
+            font-weight: 500;
             transition: transform 0.3s ease, background-color 0.3s ease;
+            display: inline-block;
         }
 
         .btn:hover {
-            transform: scale(1.05);
-            background-color: #0056b3;
+            transform: translateY(-2px);
+            background-color: #b88e14;
         }
 
         section {
-            padding: 60px 20px;
-            max-width: 1200px;
+            padding: 80px 20px;
+            max-width: 1280px;
             margin: 0 auto;
         }
 
         h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
             text-align: center;
-            color: #007BFF;
+            color: var(--navy);
             margin-bottom: 40px;
         }
 
-        /* Header Navigation */
+        /* Header */
         header {
             position: fixed;
             top: 0;
             width: 100%;
-            background-color: #fff;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
+            background-color: transparent;
             transition: background-color 0.3s ease;
+            z-index: 1000;
         }
 
         header.scrolled {
-            background-color: rgba(255, 255, 255, 0.95);
+            background-color: var(--white);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+        }
+
+        nav .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--navy);
         }
 
         nav ul {
             display: flex;
-            justify-content: center;
             list-style: none;
-            padding: 15px 0;
-            margin: 0;
+            gap: 30px;
         }
 
-        nav li {
-            margin: 0 15px;
-        }
-
-        nav a {
-            color: #007BFF;
-            font-weight: bold;
+        nav li a {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--navy);
             transition: color 0.3s ease;
         }
 
-        nav a:hover {
-            color: #0056b3;
+        nav li a:hover {
+            color: var(--gold);
         }
 
-        /* Hero Section with Parallax */
+        /* Hero Section */
         #hero {
             height: 100vh;
-            background-image: url('https://images.unsplash.com/photo-1542759564-7ccbb6ac450a?ixlib=rb-4.0.3&q=80&fm=jpg&crop=entropy&cs=tinysrgb'); /* Example high-quality mountain road image */
+            background-image: url('https://images.unsplash.com/photo-1542759564-7ccbb6ac450a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
             background-size: cover;
             background-position: center;
-            background-attachment: fixed; /* Parallax effect */
+            background-attachment: fixed;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
-            color: #fff;
             position: relative;
         }
 
@@ -106,132 +131,138 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4));
         }
 
         .hero-content {
             position: relative;
             z-index: 1;
-            max-width: 800px;
+            color: var(--white);
+            max-width: 900px;
             padding: 20px;
         }
 
         .hero-content h1 {
-            font-size: 48px;
+            font-family: 'Playfair Display', serif;
+            font-size: 56px;
             margin-bottom: 20px;
+            line-height: 1.2;
         }
 
         .hero-content p {
-            font-size: 24px;
-            margin-bottom: 30px;
+            font-size: 20px;
+            margin-bottom: 40px;
         }
 
         /* About Section */
         #about {
-            background-color: #f8f9fa;
+            background-color: var(--light-gray);
         }
 
         #about p {
-            text-align: center;
-            max-width: 800px;
+            max-width: 700px;
             margin: 0 auto;
             font-size: 18px;
-            color: #6C757D;
+            text-align: center;
+            color: var(--navy);
         }
 
         /* Bikes Section */
         #bikes {
-            background-color: #fff;
+            background-color: var(--white);
         }
 
         .bike-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 30px;
         }
 
         .bike-card {
-            border: 1px solid #ddd;
+            background-color: var(--white);
             border-radius: 10px;
             overflow: hidden;
             text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
-            background-color: #fff;
         }
 
         .bike-card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
         }
 
         .bike-card img {
             width: 100%;
-            height: 200px;
+            height: 220px;
             object-fit: cover;
             loading: lazy;
         }
 
         .bike-card h3 {
-            margin: 15px 0 10px;
-            color: #007BFF;
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            margin: 20px 0 10px;
+            color: var(--navy);
         }
 
         .bike-card p {
-            margin: 5px 15px;
-            color: #6C757D;
+            font-size: 16px;
+            color: var(--navy);
+            padding: 0 20px 20px;
+        }
+
+        .bike-card .price {
+            font-weight: 500;
+            color: var(--gold);
         }
 
         /* Why Choose Us Section */
         #why {
-            background-color: #f8f9fa;
+            background-color: var(--light-gray);
         }
 
         #why ul {
             list-style: none;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
             padding: 0;
         }
 
         #why li {
-            flex: 1 1 200px;
-            margin: 15px;
             text-align: center;
-            font-size: 18px;
-            color: #6C757D;
-            transition: transform 0.3s ease;
-        }
-
-        #why li:hover {
-            transform: scale(1.05);
+            font-size: 16px;
+            color: var(--navy);
         }
 
         #why i {
-            color: #007BFF;
-            font-size: 32px;
-            margin-bottom: 10px;
-            display: block;
-            transition: color 0.3s ease;
+            color: var(--gold);
+            font-size: 40px;
+            margin-bottom: 15px;
+            transition: transform 0.3s ease;
         }
 
         #why li:hover i {
-            color: #0056b3;
+            transform: scale(1.1);
         }
 
         /* Testimonials Section */
-        #testimonials .testimonial-grid {
+        #testimonials {
+            background-color: var(--white);
+        }
+
+        .testimonial-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 30px;
         }
 
         .testimonial {
-            border: 1px solid #ddd;
+            background-color: var(--light-gray);
             border-radius: 10px;
-            padding: 20px;
+            padding: 30px;
             text-align: center;
-            background-color: #fff;
             transition: transform 0.3s ease;
         }
 
@@ -241,38 +272,46 @@
 
         .testimonial p {
             font-style: italic;
-            color: #6C757D;
+            font-size: 16px;
+            color: var(--navy);
+            margin-bottom: 15px;
         }
 
         .stars {
-            color: #FFD700;
-            font-size: 24px;
-            margin: 10px 0;
+            color: var(--gold);
+            font-size: 20px;
+            margin-bottom: 10px;
         }
 
         .testimonial .author {
-            font-weight: bold;
-            color: #007BFF;
+            font-weight: 500;
+            font-family: 'Playfair Display', serif;
+            color: var(--navy);
         }
 
         /* Contact Section */
         #contact {
-            background-color: #f8f9fa;
-            text-align: center;
+            background-color: var(--white);
         }
 
-        #contact .contact-info {
-            margin-bottom: 30px;
+        .contact-info {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .contact-info p {
+            font-size: 18px;
+            margin: 10px 0;
         }
 
         #contact iframe {
             width: 100%;
-            max-width: 600px;
-            height: 300px;
-            border: 0;
+            max-width: 700px;
+            height: 400px;
+            border-radius: 10px;
             margin: 20px auto;
             display: block;
-            loading: lazy;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
 
         #contact form {
@@ -280,24 +319,28 @@
             margin: 0 auto;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 20px;
         }
 
         #contact label {
             text-align: left;
-            color: #6C757D;
+            font-size: 16px;
+            color: var(--navy);
+            font-weight: 500;
         }
 
         #contact input, #contact select {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             border: 1px solid #ddd;
             border-radius: 5px;
+            font-size: 16px;
             transition: border-color 0.3s ease;
         }
 
         #contact input:focus, #contact select:focus {
-            border-color: #007BFF;
+            border-color: var(--gold);
+            outline: none;
         }
 
         #contact button {
@@ -307,54 +350,67 @@
 
         /* Footer */
         footer {
-            background-color: #6C757D;
-            color: #fff;
+            background-color: var(--navy);
+            color: var(--white);
             text-align: center;
-            padding: 20px;
+            padding: 40px 20px;
         }
 
         footer a {
-            color: #fff;
-            margin: 0 10px;
+            color: var(--white);
+            margin: 0 15px;
+            font-size: 20px;
             transition: color 0.3s ease;
         }
 
         footer a:hover {
-            color: #007BFF;
+            color: var(--gold);
         }
 
         footer p {
-            margin: 5px 0;
+            font-size: 14px;
+            margin: 10px 0;
         }
 
-        /* Media Queries for Mobile */
+        /* Mobile Responsiveness */
         @media (max-width: 768px) {
             .hero-content h1 {
-                font-size: 32px;
+                font-size: 36px;
             }
 
             .hero-content p {
                 font-size: 18px;
             }
 
-            nav ul {
-                flex-wrap: wrap;
-            }
-
-            nav li {
-                margin: 10px;
-            }
-
-            #why ul {
+            nav {
                 flex-direction: column;
+                gap: 20px;
+            }
+
+            nav ul {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            h2 {
+                font-size: 28px;
+            }
+
+            .bike-card img {
+                height: 180px;
+            }
+
+            #contact iframe {
+                height: 300px;
             }
         }
     </style>
 </head>
 <body>
-
     <header>
         <nav>
+            <div class="logo">AV Rental Shimla</div>
             <ul>
                 <li><a href="#hero">Home</a></li>
                 <li><a href="#about">About</a></li>
@@ -367,44 +423,44 @@
     </header>
 
     <section id="hero">
-        <div class="hero-content">
-            <h1>Rent a Bike in Shimla — Fast, Affordable, Reliable.</h1>
-            <p>Explore Shimla your way. Easy bookings, trusted service.</p>
+        <div class="hero-content" data-aos="fade-up">
+            <h1>Explore Shimla with Ease</h1>
+            <p>Rent premium bikes and scooters for an unforgettable adventure. Fast, affordable, reliable.</p>
             <a href="https://wa.me/911234567890?text=I'd%20like%20to%20book%20a%20bike" class="btn">Book Now on WhatsApp</a>
         </div>
     </section>
 
     <section id="about" data-aos="fade-up">
-        <h2>About AV Rental Shimla</h2>
-        <p>AV Rental Shimla provides top-quality scooters and bikes for tourists and locals. Whether you want a quick ride or a weekend adventure, we make your trip smooth, safe, and affordable.</p>
+        <h2>About Us</h2>
+        <p>AV Rental Shimla offers premium scooters and motorcycles for tourists and locals alike. From quick city rides to thrilling mountain adventures, we ensure a seamless, safe, and affordable experience tailored to your journey.</p>
     </section>
 
     <section id="bikes" data-aos="fade-up">
         <h2>Our Bikes</h2>
         <div class="bike-grid">
             <div class="bike-card" data-aos="zoom-in">
-                <img src="https://images.unsplash.com/photo-1622181644696-33087bb88275?ixlib=rb-4.0.3&q=80&fm=jpg&crop=entropy&cs=tinysrgb" alt="Activa 125" loading="lazy"> <!-- Placeholder for Activa -->
+                <img src="https://images.unsplash.com/photo-1622181644696-33087bb88275?auto=format&fit=crop&w=600&q=80" alt="Activa 125" loading="lazy">
                 <h3>Activa 125</h3>
-                <p>Price: ₹500/day</p>
-                <p>Comfortable scooter perfect for city exploration and short trips around Shimla.</p>
+                <p class="price">₹500/day</p>
+                <p>Perfect for zipping through Shimla’s streets with ease and comfort.</p>
             </div>
             <div class="bike-card" data-aos="zoom-in" data-aos-delay="100">
-                <img src="https://images.unsplash.com/photo-1568659359794-17fd81a0ba56?ixlib=rb-4.0.3&q=80&fm=jpg&crop=entropy&cs=tinysrgb" alt="Royal Enfield Classic" loading="lazy"> <!-- Placeholder for RE Classic -->
+                <img src="https://images.unsplash.com/photo-1568659359794-17fd81a0ba56?auto=format&fit=crop&w=600&q=80" alt="Royal Enfield Classic" loading="lazy">
                 <h3>Royal Enfield Classic 350</h3>
-                <p>Price: ₹1000/day</p>
-                <p>Iconic bike for scenic mountain rides with a vintage feel and reliable performance.</p>
+                <p class="price">₹1000/day</p>
+                <p>A timeless ride for scenic mountain roads with unmatched style.</p>
             </div>
             <div class="bike-card" data-aos="zoom-in" data-aos-delay="200">
-                <img src="https://images.unsplash.com/photo-1622181644696-33087bb88275?ixlib=rb-4.0.3&q=80&fm=jpg&crop=entropy&cs=tinysrgb" alt="Himalayan" loading="lazy"> <!-- Placeholder for Himalayan -->
+                <img src="https://images.unsplash.com/photo-1622181644696-33087bb88275?auto=format&fit=crop&w=600&q=80" alt="Himalayan" loading="lazy">
                 <h3>Himalayan</h3>
-                <p>Price: ₹1200/day</p>
-                <p>Adventure bike designed for tough terrains and long journeys in the Himalayas.</p>
+                <p class="price">₹1200/day</p>
+                <p>Built for rugged terrains and epic Himalayan adventures.</p>
             </div>
             <div class="bike-card" data-aos="zoom-in" data-aos-delay="300">
-                <img src="https://images.unsplash.com/photo-1558981408-db0ecd3d9444?ixlib=rb-4.0.3&q=80&fm=jpg&crop=entropy&cs=tinysrgb" alt="Pulsar 220" loading="lazy"> <!-- Placeholder for Pulsar -->
+                <img src="https://images.unsplash.com/photo-1558981408-db0ecd3d9444?auto=format&fit=crop&w=600&q=80" alt="Pulsar 220" loading="lazy">
                 <h3>Pulsar 220</h3>
-                <p>Price: ₹800/day</p>
-                <p>Sporty and powerful bike ideal for thrill-seekers and highway cruises.</p>
+                <p class="price">₹800/day</p>
+                <p>Sporty and powerful, ideal for thrill-seekers and open roads.</p>
             </div>
         </div>
     </section>
@@ -412,50 +468,49 @@
     <section id="why" data-aos="fade-up">
         <h2>Why Choose Us</h2>
         <ul>
-            <li data-aos="fade-right"><i class="fas fa-money-bill-wave"></i>Lowest rental rates</li>
-            <li data-aos="fade-right" data-aos-delay="100"><i class="fas fa-wrench"></i>Well-maintained bikes</li>
-            <li data-aos="fade-right" data-aos-delay="200"><i class="fas fa-clock"></i>Flexible pickup and drop</li>
-            <li data-aos="fade-right" data-aos-delay="300"><i class="fas fa-headset"></i>24/7 WhatsApp support</li>
-            <li data-aos="fade-right" data-aos-delay="400"><i class="fas fa-users"></i>Trusted by 500+ riders</li>
+            <li data-aos="fade-right"><i class="fas fa-money-bill-wave"></i>Lowest Rental Rates</li>
+            <li data-aos="fade-right" data-aos-delay="100"><i class="fas fa-wrench"></i>Well-Maintained Bikes</li>
+            <li data-aos="fade-right" data-aos-delay="200"><i class="fas fa-clock"></i>Flexible Pickup & Drop</li>
+            <li data-aos="fade-right" data-aos-delay="300"><i class="fas fa-headset"></i>24/7 WhatsApp Support</li>
+            <li data-aos="fade-right" data-aos-delay="400"><i class="fas fa-users"></i>Trusted by 500+ Riders</li>
         </ul>
     </section>
 
     <section id="testimonials" data-aos="fade-up">
-        <h2>Testimonials</h2>
+        <h2>What Our Riders Say</h2>
         <div class="testimonial-grid">
             <div class="testimonial" data-aos="flip-left">
-                <p>"Excellent bikes and superb service. Made my Shimla trip unforgettable!"</p>
+                <p>“An incredible experience! The bikes were in top condition, and the team made booking a breeze.”</p>
                 <div class="stars">★★★★★</div>
-                <p class="author">- Sarah Johnson</p>
+                <p class="author">Sarah Johnson</p>
             </div>
             <div class="testimonial" data-aos="flip-left" data-aos-delay="100">
-                <p>"Affordable prices and well-maintained vehicles. Highly recommend!"</p>
+                <p>“Affordable and reliable. Perfect for exploring Shimla’s beauty!”</p>
                 <div class="stars">★★★★☆</div>
-                <p class="author">- Mike Lee</p>
+                <p class="author">Mike Lee</p>
             </div>
             <div class="testimonial" data-aos="flip-left" data-aos-delay="200">
-                <p>"Easy booking via WhatsApp and flexible options. Will rent again."</p>
+                <p>“Superb service and flexibility. Will definitely rent again!”</p>
                 <div class="stars">★★★★★</div>
-                <p class="author">- Priya Sharma</p>
+                <p class="author">Priya Sharma</p>
             </div>
         </div>
     </section>
 
     <section id="contact" data-aos="fade-up">
-        <h2>Contact / Booking</h2>
+        <h2>Contact & Book</h2>
         <div class="contact-info">
             <a href="https://wa.me/911234567890?text=I'd%20like%20to%20book%20a%20bike" class="btn">WhatsApp Us</a>
             <p>Phone: +91 1234567890</p>
-            <p>Address: Shimla, Himachal Pradesh, India</p>
+            <p>Address: Mall Road, Shimla, Himachal Pradesh, India</p>
         </div>
         <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d109330.61206550665!2d77.09175972839398!3d31.104805599999997!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390fe973ed18d78b%3A0x4b3e9bdd7d87c4a3!2sShimla%2C%20Himachal%20Pradesh!5e0!3m2!1sen!2sin!4v1697729170000" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-        <h3>Book Now</h3>
-        <!-- Form submits to Formspree (replace 'your-formspree-id' with actual from formspree.io). Alternatively, for Google Sheets, set up a Google Apps Script web app and use fetch in JS. -->
+        <h3>Book Your Ride</h3>
         <form id="contact-form">
-            <label>Name: <input type="text" name="name" required></label>
-            <label>Phone: <input type="tel" name="phone" required></label>
-            <label>Dates: <input type="text" name="dates" placeholder="e.g., 2025-10-20 to 2025-10-22" required></label>
-            <label>Bike Preference:
+            <label>Name <input type="text" name="name" required></label>
+            <label>Phone <input type="tel" name="phone" required></label>
+            <label>Dates <input type="text" name="dates" placeholder="e.g., 2025-10-20 to 2025-10-22" required></label>
+            <label>Bike Preference
                 <select name="bike">
                     <option>Activa 125</option>
                     <option>Royal Enfield Classic 350</option>
@@ -468,19 +523,25 @@
     </section>
 
     <footer>
-        <p>Follow us: <a href="#"><i class="fab fa-facebook-f"></i></a> <a href="#"><i class="fab fa-instagram"></i></a> <a href="#"><i class="fab fa-twitter"></i></a></p>
+        <p>Follow Us: 
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+        </p>
         <a href="#">Privacy Policy</a>
-        <p>&copy; 2025 AV Rental Shimla. All rights reserved.</p>
+        <p>&copy; 2025 AV Rental Shimla. All Rights Reserved.</p>
     </footer>
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
+        // Initialize AOS animations
         AOS.init({
-            duration: 800,
-            once: true
+            duration: 1000,
+            once: true,
+            easing: 'ease-out'
         });
 
-        // Smooth scrolling for anchor links
+        // Smooth scrolling
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -490,13 +551,13 @@
             });
         });
 
-        // Scrolled header
+        // Header scroll effect
         window.addEventListener('scroll', () => {
             const header = document.querySelector('header');
-            header.classList.toggle('scrolled', window.scrollY > 0);
+            header.classList.toggle('scrolled', window.scrollY > 50);
         });
 
-        // Form submission (example with Formspree via JS)
+        // Form submission with Formspree
         const form = document.getElementById('contact-form');
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -508,16 +569,15 @@
                     headers: { Accept: 'application/json' }
                 });
                 if (response.ok) {
-                    alert('Form submitted successfully!');
+                    alert('Booking request submitted successfully!');
                     form.reset();
                 } else {
-                    alert('There was an error submitting the form.');
+                    alert('Error submitting the form. Please try again.');
                 }
             } catch (error) {
-                alert('There was an error submitting the form.');
+                alert('Error submitting the form. Please try again.');
             }
         });
     </script>
-
 </body>
-    </html>
+</html>
