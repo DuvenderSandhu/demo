@@ -3,329 +3,458 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="LuxWash AI: India’s premier AI-powered dishwasher for modern homes. Elevate your kitchen with elegance and innovation.">
-    <meta name="keywords" content="LuxWash AI, AI dishwasher, smart kitchen, Indian kitchen, luxury appliances">
-    <meta name="author" content="LuxWash AI">
-    <title>LuxWash AI Dishwasher - Redefine Kitchen Luxury</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <title>AV Rental Shimla</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* Global Styles */
         body {
-            font-family: 'Roboto', sans-serif;
-            color: #2d2d2d;
-            background: #f9f7f0;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            background-color: #fff;
+            scroll-behavior: smooth;
         }
-        h1, h2, h3 {
-            font-family: 'Playfair Display', serif;
-            font-weight: 900;
+
+        a {
+            text-decoration: none;
         }
-        .hero-bg {
-            background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+
+        .btn {
+            background-color: #007BFF;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 5px;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            background-color: #0056b3;
+        }
+
+        section {
+            padding: 60px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h2 {
+            text-align: center;
+            color: #007BFF;
+            margin-bottom: 40px;
+        }
+
+        /* Header Navigation */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        nav ul {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            padding: 15px 0;
+            margin: 0;
+        }
+
+        nav li {
+            margin: 0 15px;
+        }
+
+        nav a {
+            color: #007BFF;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #0056b3;
+        }
+
+        /* Hero Section */
+        #hero {
+            height: 80vh;
+            background-image: url('https://via.placeholder.com/1920x1080?text=Shimla+Mountain+Roads+with+Bikes');
             background-size: cover;
             background-position: center;
-            background-attachment: fixed;
-            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-        }
-        .animate-slide-up {
-            animation: slideUp 1.2s ease-out;
-        }
-        @keyframes slideUp {
-            from { transform: translateY(40px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        .hover-scale:hover {
-            transform: scale(1.05);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .feature-card {
-            transition: all 0.4s ease;
-            background: #ffffff;
-            border-radius: 15px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-        }
-        .feature-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 30px rgba(0,0,0,0.2);
-        }
-        .cta-section {
-            background: linear-gradient(135deg, #d4a017 0%, #b8860b 100%);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
-            border-radius: 25px;
-            margin: 3rem auto;
-            max-width: 1400px;
-            overflow: hidden;
+            text-align: center;
+            color: #fff;
             position: relative;
         }
-        .cta-image {
-            background-image: url('https://images.unsplash.com/photo-1616628188558-80fb7f8e4a9f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80');
-            background-size: cover;
-            background-position: center;
-            border-radius: 15px;
-            min-height: 400px;
-        }
-        .cta-overlay {
-            background: rgba(0,0,0,0.3);
+
+        #hero::before {
+            content: '';
             position: absolute;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
-            border-radius: 15px;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
         }
-        .btn-primary {
-            background: #ffffff;
-            color: #b8860b;
-            padding: 0.75rem 1.5rem;
-            border-radius: 50px;
-            font-size: 1rem;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            white-space: nowrap;
-        }
-        .btn-primary:hover {
-            background: #f9f7f0;
-            transform: scale(1.1);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-        .btn-secondary {
-            border: 2px solid #ffffff;
-            color: #ffffff;
-            padding: 0.75rem 1.5rem;
-            border-radius: 50px;
-            font-size: 1rem;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            white-space: nowrap;
-        }
-        .btn-secondary:hover {
-            background: #ffffff;
-            color: #b8860b;
-            transform: scale(1.1);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-        .svg-icon {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 40px;
-            height: 40px;
-        }
-        .form-section {
-            background: #ffffff;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-            border-radius: 15px;
-            max-width: 600px;
-            margin: -4rem auto 4rem;
+
+        .hero-content {
             position: relative;
-            z-index: 10;
+            z-index: 1;
+            max-width: 800px;
+            padding: 20px;
         }
-        input, button {
-            border-radius: 8px;
+
+        .hero-content h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
         }
-        input:focus {
-            outline: none;
-            border-color: #b8860b;
-            box-shadow: 0 0 5px rgba(184, 134, 11, 0.3);
+
+        .hero-content p {
+            font-size: 24px;
+            margin-bottom: 30px;
         }
-        @media (max-width: 640px) {
-            .btn-primary, .btn-secondary {
-                padding: 0.5rem 1.25rem;
-                font-size: 0.9rem;
+
+        /* About Section */
+        #about {
+            background-color: #f8f9fa;
+        }
+
+        #about p {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+            font-size: 18px;
+            color: #6C757D;
+        }
+
+        /* Bikes Section */
+        #bikes {
+            background-color: #fff;
+        }
+
+        .bike-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .bike-card {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background-color: #fff;
+        }
+
+        .bike-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .bike-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .bike-card h3 {
+            margin: 15px 0 10px;
+            color: #007BFF;
+        }
+
+        .bike-card p {
+            margin: 5px 15px;
+            color: #6C757D;
+        }
+
+        /* Why Choose Us Section */
+        #why {
+            background-color: #f8f9fa;
+        }
+
+        #why ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 0;
+        }
+
+        #why li {
+            flex: 1 1 200px;
+            margin: 15px;
+            text-align: center;
+            font-size: 18px;
+            color: #6C757D;
+        }
+
+        #why i {
+            color: #007BFF;
+            font-size: 32px;
+            margin-bottom: 10px;
+            display: block;
+            transition: color 0.3s ease;
+        }
+
+        #why li:hover i {
+            color: #0056b3;
+        }
+
+        /* Testimonials Section */
+        #testimonials .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .testimonial {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            background-color: #fff;
+            transition: transform 0.3s ease;
+        }
+
+        .testimonial:hover {
+            transform: translateY(-5px);
+        }
+
+        .testimonial p {
+            font-style: italic;
+            color: #6C757D;
+        }
+
+        .stars {
+            color: #FFD700;
+            font-size: 24px;
+            margin: 10px 0;
+        }
+
+        .testimonial .author {
+            font-weight: bold;
+            color: #007BFF;
+        }
+
+        /* Contact Section */
+        #contact {
+            background-color: #f8f9fa;
+            text-align: center;
+        }
+
+        #contact .contact-info {
+            margin-bottom: 30px;
+        }
+
+        #contact iframe {
+            width: 100%;
+            max-width: 600px;
+            height: 300px;
+            border: 0;
+            margin: 20px auto;
+            display: block;
+        }
+
+        #contact form {
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        #contact label {
+            text-align: left;
+            color: #6C757D;
+        }
+
+        #contact input, #contact select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        #contact button {
+            width: fit-content;
+            margin: 0 auto;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #6C757D;
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+        }
+
+        footer a {
+            color: #fff;
+            margin: 0 10px;
+            transition: color 0.3s ease;
+        }
+
+        footer a:hover {
+            color: #007BFF;
+        }
+
+        footer p {
+            margin: 5px 0;
+        }
+
+        /* Media Queries for Mobile */
+        @media (max-width: 768px) {
+            .hero-content h1 {
+                font-size: 32px;
             }
-            .cta-image {
-                min-height: 300px;
+
+            .hero-content p {
+                font-size: 18px;
             }
-            h1 {
-                font-size: 2.5rem;
+
+            nav ul {
+                flex-wrap: wrap;
             }
-            h2 {
-                font-size: 2.25rem;
+
+            nav li {
+                margin: 10px;
             }
-            h3 {
-                font-size: 1.5rem;
-            }
-            .form-section {
-                margin: -2rem 1rem 2rem;
+
+            #why ul {
+                flex-direction: column;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Hero Section -->
-    <section class="hero-bg text-center text-white" aria-label="LuxWash AI Hero Section">
-        <div class="animate-slide-up px-6 md:px-12">
-            <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 leading-tight tracking-tight">LuxWash AI: Elegance Meets Innovation</h1>
-            <p class="text-lg sm:text-xl md:text-2xl mb-10 font-light max-w-3xl mx-auto">India’s premier AI-powered dishwasher, crafted to elevate your kitchen with unmatched sophistication.</p>
-            <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
-                <a href="#order" class="btn-primary hover-scale" aria-label="Reserve LuxWash AI Dishwasher">Reserve Now</a>
-                <a href="#learn-more" class="btn-secondary hover-scale" aria-label="Discover LuxWash AI Features">Discover More</a>
+
+    <header>
+        <nav>
+            <ul>
+                <li><a href="#hero">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#bikes">Bikes</a></li>
+                <li><a href="#why">Why Us</a></li>
+                <li><a href="#testimonials">Testimonials</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="hero">
+        <div class="hero-content">
+            <h1>Rent a Bike in Shimla — Fast, Affordable, Reliable.</h1>
+            <p>Explore Shimla your way. Easy bookings, trusted service.</p>
+            <a href="https://wa.me/911234567890?text=I'd%20like%20to%20book%20a%20bike" class="btn">Book Now on WhatsApp</a>
+        </div>
+    </section>
+
+    <section id="about">
+        <h2>About AV Rental Shimla</h2>
+        <p>AV Rental Shimla provides top-quality scooters and bikes for tourists and locals. Whether you want a quick ride or a weekend adventure, we make your trip smooth, safe, and affordable.</p>
+    </section>
+
+    <section id="bikes">
+        <h2>Our Bikes</h2>
+        <div class="bike-grid">
+            <div class="bike-card">
+                <img src="https://via.placeholder.com/300x200?text=Activa+125" alt="Activa 125">
+                <h3>Activa 125</h3>
+                <p>Price: ₹500/day</p>
+                <p>Comfortable scooter perfect for city exploration and short trips around Shimla.</p>
+            </div>
+            <div class="bike-card">
+                <img src="https://via.placeholder.com/300x200?text=Royal+Enfield+Classic" alt="Royal Enfield Classic">
+                <h3>Royal Enfield Classic 350</h3>
+                <p>Price: ₹1000/day</p>
+                <p>Iconic bike for scenic mountain rides with a vintage feel and reliable performance.</p>
+            </div>
+            <div class="bike-card">
+                <img src="https://via.placeholder.com/300x200?text=Himalayan" alt="Himalayan">
+                <h3>Himalayan</h3>
+                <p>Price: ₹1200/day</p>
+                <p>Adventure bike designed for tough terrains and long journeys in the Himalayas.</p>
+            </div>
+            <div class="bike-card">
+                <img src="https://via.placeholder.com/300x200?text=Pulsar+220" alt="Pulsar 220">
+                <h3>Pulsar 220</h3>
+                <p>Price: ₹800/day</p>
+                <p>Sporty and powerful bike ideal for thrill-seekers and highway cruises.</p>
             </div>
         </div>
     </section>
 
-    <!-- Lead Capture Form Section -->
-    <section class="form-section py-8 px-6 sm:px-10" aria-label="Lead Capture Form">
-        <h2 class="text-2xl sm:text-3xl font-bold text-center mb-6 text-amber-900">Unlock Exclusive LuxWash AI Offers</h2>
-        <p class="text-center text-gray-600 mb-8">Sign up now to receive priority updates and a special discount on your LuxWash AI purchase!</p>
-        <form action="/submit" method="POST" class="flex flex-col sm:flex-row gap-4 justify-center">
-            <input type="email" name="email" placeholder="Enter your email" class="p-3 border border-gray-300 text-gray-600 focus:border-amber-500" required aria-label="Email Address">
-            <button type="submit" class="btn-primary hover-scale" aria-label="Join Now">Join Now</button>
+    <section id="why">
+        <h2>Why Choose Us</h2>
+        <ul>
+            <li><i class="fas fa-money-bill-wave"></i>Lowest rental rates</li>
+            <li><i class="fas fa-wrench"></i>Well-maintained bikes</li>
+            <li><i class="fas fa-clock"></i>Flexible pickup and drop</li>
+            <li><i class="fas fa-headset"></i>24/7 WhatsApp support</li>
+            <li><i class="fas fa-users"></i>Trusted by 500+ riders</li>
+        </ul>
+    </section>
+
+    <section id="testimonials">
+        <h2>Testimonials</h2>
+        <div class="testimonial-grid">
+            <div class="testimonial">
+                <p>"Excellent bikes and superb service. Made my Shimla trip unforgettable!"</p>
+                <div class="stars">★★★★★</div>
+                <p class="author">- Sarah Johnson</p>
+            </div>
+            <div class="testimonial">
+                <p>"Affordable prices and well-maintained vehicles. Highly recommend!"</p>
+                <div class="stars">★★★★☆</div>
+                <p class="author">- Mike Lee</p>
+            </div>
+            <div class="testimonial">
+                <p>"Easy booking via WhatsApp and flexible options. Will rent again."</p>
+                <div class="stars">★★★★★</div>
+                <p class="author">- Priya Sharma</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact">
+        <h2>Contact / Booking</h2>
+        <div class="contact-info">
+            <a href="https://wa.me/911234567890?text=I'd%20like%20to%20book%20a%20bike" class="btn">WhatsApp Us</a>
+            <p>Phone: +91 1234567890</p>
+            <p>Address: Shimla, Himachal Pradesh, India</p>
+        </div>
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d109330.61206550665!2d77.09175972839398!3d31.104805599999997!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390fe973ed18d78b%3A0x4b3e9bdd7d87c4a3!2sShimla%2C%20Himachal%20Pradesh!5e0!3m2!1sen!2sin!4v1697729170000" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <h3>Book Now</h3>
+        <!-- Form submits to Formspree (replace 'your-formspree-id' with actual endpoint from formspree.io) -->
+        <form action="https://formspree.io/f/your-formspree-id" method="POST">
+            <label>Name: <input type="text" name="name" required></label>
+            <label>Phone: <input type="tel" name="phone" required></label>
+            <label>Dates: <input type="text" name="dates" placeholder="e.g., 2025-10-20 to 2025-10-22" required></label>
+            <label>Bike Preference:
+                <select name="bike">
+                    <option>Activa 125</option>
+                    <option>Royal Enfield Classic 350</option>
+                    <option>Himalayan</option>
+                    <option>Pulsar 220</option>
+                </select>
+            </label>
+            <button type="submit" class="btn">Submit</button>
         </form>
     </section>
 
-    <!-- Features Section -->
-    <section class="py-20 sm:py-24 bg-white" aria-label="LuxWash AI Features">
-        <div class="container mx-auto px-6">
-            <h2 class="text-4xl sm:text-5xl font-bold text-center mb-12 sm:mb-16 text-amber-900">Exquisite Features for Your Home</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 sm:gap-10">
-                <div class="feature-card text-center p-6 sm:p-8">
-                    <img src="https://images.unsplash.com/photo-1596755094514-f87e34085b2c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Crystal Elegance Door" class="mx-auto mb-6 rounded-lg" loading="lazy">
-                    <h3 class="text-xl sm:text-2xl font-semibold mb-4 text-amber-900">Crystal Elegance Door</h3>
-                    <p class="text-gray-600">Watch your dishes sparkle through a sleek, transparent finish that transforms your kitchen into a masterpiece.</p>
-                </div>
-                <div class="feature-card text-center p-6 sm:p-8">
-                    <img src="https://images.unsplash.com/photo-1596755094514-f87e34085b2c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Effortless Touch Mastery" class="mx-auto mb-6 rounded-lg" loading="lazy">
-                    <h3 class="text-xl sm:text-2xl font-semibold mb-4 text-amber-900">Effortless Touch Mastery</h3>
-                    <p class="text-gray-600">Command your kitchen with a sleek touch interface, blending intuitive elegance with modern sophistication.</p>
-                </div>
-                <div class="feature-card text-center p-6 sm:p-8">
-                    <img src="https://images.unsplash.com/photo-1596755094514-f87e34085b2c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="AI-Powered Perfection" class="mx-auto mb-6 rounded-lg" loading="lazy">
-                    <h3 class="text-xl sm:text-2xl font-semibold mb-4 text-amber-900">AI-Powered Perfection</h3>
-                    <p class="text-gray-600">Intelligent wash cycles adapt to every load, delivering flawless results with minimal effort.</p>
-                </div>
-                <div class="feature-card text-center p-6 sm:p-8">
-                    <img src="https://images.unsplash.com/photo-1596755094514-f87e34085b2c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Eco-Luxe Efficiency" class="mx-auto mb-6 rounded-lg" loading="lazy">
-                    <h3 class="text-xl sm:text-2xl font-semibold mb-4 text-amber-900">Eco-Luxe Efficiency</h3>
-                    <p class="text-gray-600">Embrace sustainability with AI-optimized cycles that save water and energy, crafted for a greener future.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Why This Dishwasher Section -->
-    <section class="py-20 sm:py-24 bg-amber-50" aria-label="Why Choose LuxWash AI">
-        <div class="container mx-auto px-6">
-            <h2 class="text-4xl sm:text-5xl font-bold text-center mb-12 sm:mb-16 text-amber-900">A Revolution for Indian Kitchens</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-10 sm:gap-12">
-                <div class="flex items-start">
-                    <div class="svg-icon mr-4 sm:mr-6">
-                        <svg class="w-8 h-8 text-amber-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 11H9v2H7v-2H5v-2h2V9h2v2h2v2z"/></svg>
-                    </div>
-                    <div>
-                        <h3 class="text-xl sm:text-2xl font-semibold mb-4 text-amber-900">Celebrate Culinary Heritage</h3>
-                        <p class="text-gray-600">From gleaming thaalis to robust kadhais, LuxWash AI ensures every piece shines, ready for festive feasts or daily dinners.</p>
-                    </div>
-                </div>
-                <div class="flex items-start">
-                    <div class="svg-icon mr-4 sm:mr-6">
-                        <svg class="w-8 h-8 text-amber-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 11H9v2H7v-2H5v-2h2V9h2v2h2v2z"/></svg>
-                    </div>
-                    <div>
-                        <h3 class="text-xl sm:text-2xl font-semibold mb-4 text-amber-900">Reclaim Precious Moments</h3>
-                        <p class="text-gray-600">Say goodbye to scrubbing and hello to quality time—whether it’s hosting Diwali celebrations or helping with homework.</p>
-                    </div>
-                </div>
-                <div class="flex items-start">
-                    <div class="svg-icon mr-4 sm:mr-6">
-                        <svg class="w-8 h-8 text-amber-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 11H9v2H7v-2H5v-2h2V9h2v2h2v2z"/></svg>
-                    </div>
-                    <div>
-                        <h3 class="text-xl sm:text-2xl font-semibold mb-4 text-amber-900">A Symbol of Prestige</h3>
-                        <p class="text-gray-600">Elevate your kitchen with a dishwasher that blends cutting-edge AI with timeless elegance, designed for discerning Indian homeowners.</p>
-                    </div>
-                </div>
-                <div class="flex items-start">
-                    <div class="svg-icon mr-4 sm:mr-6">
-                        <svg class="w-8 h-8 text-amber-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 11H9v2H7v-2H5v-2h2V9h2v2h2v2z"/></svg>
-                    </div>
-                    <div>
-                        <h3 class="text-xl sm:text-2xl font-semibold mb-4 text-amber-900">Sustainable Sophistication</h3>
-                        <p class="text-gray-600">Save water and energy with AI-driven efficiency, aligning with the modern Indian ethos of sustainability.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Testimonials Section -->
-    <section class="py-20 sm:py-24 bg-white" aria-label="Customer Testimonials">
-        <div class="container mx-auto px-6">
-            <h2 class="text-4xl sm:text-5xl font-bold text-center mb-12 sm:mb-16 text-amber-900">Loved by Indian Homeowners</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 sm:gap-10">
-                <div class="feature-card text-center p-6 sm:p-10">
-                    <p class="text-gray-600 italic mb-6 text-base sm:text-lg">"LuxWash AI has redefined my kitchen. My thaalis and kadhais gleam, and the sleek design is a conversation starter at every dinner party!"</p>
-                    <p class="font-semibold text-amber-900">Priya Sharma, Bengaluru</p>
-                </div>
-                <div class="feature-card text-center p-6 sm:p-10">
-                    <p class="text-gray-600 italic mb-6 text-base sm:text-lg">"As a busy professional, this dishwasher is a game-changer. The touch screen is intuitive, and it handles greasy tavas to delicate glassware with ease."</p>
-                    <p class="font-semibold text-amber-900">Anita Desai, Mumbai</p>
-                </div>
-                <div class="feature-card text-center p-6 sm:p-10">
-                    <p class="text-gray-600 italic mb-6 text-base sm:text-lg">"The AI technology is pure magic! It adjusts perfectly for every load, saving me time and effort. This is the future of Indian kitchens."</p>
-                    <p class="font-semibold text-amber-900">Rohan Gupta, Delhi</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- FAQ Section -->
-    <section class="py-20 sm:py-24 bg-amber-50" aria-label="Frequently Asked Questions">
-        <div class="container mx-auto px-6">
-            <h2 class="text-4xl sm:text-5xl font-bold text-center mb-12 sm:mb-16 text-amber-900">Your Questions, Answered</h2>
-            <div class="space-y-8 sm:space-y-10 max-w-4xl mx-auto">
-                <div>
-                    <h3 class="text-xl sm:text-2xl font-semibold mb-4 text-amber-900">Can it clean tough Indian cookware like kadhais and tavas?</h3>
-                    <p class="text-gray-600">Absolutely! LuxWash AI’s AI-driven wash cycles tackle tough grease and stains on traditional Indian cookware, delivering a pristine shine.</p>
-                </div>
-                <div>
-                    <h3 class="text-xl sm:text-2xl font-semibold mb-4 text-amber-900">Is it easy to install in an Indian kitchen?</h3>
-                    <p class="text-gray-600">Yes, LuxWash AI is designed for seamless integration into modern Indian kitchens, with a compact design and expert installation support included.</p>
-                </div>
-                <div>
-                    <h3 class="text-xl sm:text-2xl font-semibold mb-4 text-amber-900">How does the AI feature save time and effort?</h3>
-                    <p class="text-gray-600">The intelligent AI optimizes water, energy, and cycle time for each load, ensuring spotless results with minimal effort, perfect for busy Indian households.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Closing CTA Section -->
-    <section class="cta-section py-20 sm:py-24 text-white" aria-label="Call to Action">
-        <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12 items-center relative">
-            <div class="cta-image relative">
-                <div class="cta-overlay"></div>
-                <div class="absolute bottom-6 sm:bottom-8 left-6 sm:left-8 text-white">
-                    <p class="text-xl sm:text-2xl font-semibold">Experience Spotless Luxury</p>
-                    <p class="text-base sm:text-lg">Your kitchen deserves the best.</p>
-                </div>
-            </div>
-            <div class="text-center md:text-left">
-                <h2 class="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 leading-tight text-white">Step Into Kitchen Luxury</h2>
-                <p class="text-lg sm:text-xl md:text-2xl mb-8 font-light">LuxWash AI isn’t just a dishwasher—it’s a lifestyle upgrade. Limited stock—secure yours now and redefine your kitchen’s elegance.</p>
-                <div class="flex flex-col sm:flex-row justify-center md:justify-start space-y-4 sm:space-y-0 sm:space-x-6">
-                    <a href="#order" class="btn-primary hover-scale" aria-label="Order LuxWash AI Dishwasher">Order Now</a>
-                    <a href="#learn-more" class="btn-secondary hover-scale" aria-label="Explore LuxWash AI Features">Explore Features</a>
-                </div>
-                <p class="text-sm mt-6 sm:mt-8 italic">Exclusive Offer: Free Installation + 1-Year Extended Warranty for Orders by July 31, 2025.</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="py-10 sm:py-12 bg-gray-900 text-white text-center" aria-label="Footer">
-        <p class="text-base sm:text-lg mb-4">© 2025 LuxWash AI. Crafted for the Discerning Indian Home.</p>
-        <div class="flex justify-center space-x-4 sm:space-x-6">
-            <a href="#contact" class="hover:text-amber-500" aria-label="Contact Us">Contact Us</a>
-            <a href="#support" class="hover:text-amber-500" aria-label="Support">Support</a>
-            <a href="#terms" class="hover:text-amber-500" aria-label="Terms and Conditions">Terms & Conditions</a>
-        </div>
+    <footer>
+        <p>Follow us: <a href="#"><i class="fab fa-facebook-f"></i></a> <a href="#"><i class="fab fa-instagram"></i></a> <a href="#"><i class="fab fa-twitter"></i></a></p>
+        <a href="#">Privacy Policy</a>
+        <p>&copy; 2025 AV Rental Shimla. All rights reserved.</p>
     </footer>
 
     <script>
-        // Smooth scroll for anchor links
+        // Smooth scrolling for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -334,24 +463,7 @@
                 });
             });
         });
-
-        // Parallax effect for hero section
-        window.addEventListener('scroll', function () {
-            const hero = document.querySelector('.hero-bg');
-            const scrollPosition = window.pageYOffset;
-            hero.style.backgroundPositionY = `${scrollPosition * 0.5}px`;
-        });
-
-        // Fade-in animation for sections on scroll
-        const sections = document.querySelectorAll('section');
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('animate-slide-up');
-                }
-            });
-        }, { threshold: 0.2 });
-        sections.forEach(section => observer.observe(section));
     </script>
+
 </body>
-  </html>
+</html>
