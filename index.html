@@ -81,15 +81,24 @@
         <div id="progress"></div>
     </div>
 
+    <!-- CDN Scripts -->
     <script src="https://unpkg.com/tesseract.js@v5.1.1/dist/tesseract.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.7.76/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.7.76/pdf.min.mjs"></script>
 
     <script>
-        // Set pdf.js worker
-        window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.7.76/pdf.worker.min.js';
+        // Ensure pdf.js worker is set after the script loads
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof window.pdfjsLib !== 'undefined') {
+                window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.7.76/pdf.worker.min.mjs';
+            } else {
+                console.error('pdf.js failed to load.');
+                document.getElementById('progress').textContent = 'Error: pdf.js not loaded. PDF support disabled.';
+            }
+        });
 
+        // Element references
         const uploadBtn = document.getElementById('uploadBtn');
         const fileInput = document.getElementById('fileInput');
         const preview = document.getElementById('preview');
@@ -103,26 +112,35 @@
         const thresholdChk = document.getElementById('thresholdChk');
         const progress = document.getElementById('progress');
 
+        // Canvas for image processing
         let canvas = document.createElement('canvas');
         let ctx = canvas.getContext('2d');
         let currentImageUrl = null;
 
+        // Upload button triggers file input
         uploadBtn.onclick = () => fileInput.click();
 
+        // Handle file upload
         fileInput.onchange = (e) => {
             const file = e.target.files[0];
-            if (!file) return;
+            if (!file) {
+                progress.textContent = 'No file selected.';
+                return;
+            }
             const url = URL.createObjectURL(file);
             currentImageUrl = url;
             preview.innerHTML = '';
             progress.textContent = 'Loading file...';
             if (file.type === 'application/pdf') {
                 loadPdf(url);
-            } else {
+            } else if (file.type.startsWith('image/')) {
                 loadImage(url);
+            } else {
+                progress.textContent = 'Unsupported file type. Please upload an image or PDF.';
             }
         };
 
+        // Load image to canvas and preview
         function loadImage(url) {
             const img = new Image();
             img.onload = () => {
@@ -134,10 +152,18 @@
                 preview.appendChild(previewImg);
                 progress.textContent = '';
             };
+            img.onerror = () => {
+                progress.textContent = 'Error loading image.';
+            };
             img.src = url;
         }
 
+        // Load PDF to canvas and preview
         function loadPdf(url) {
+            if (typeof window.pdfjsLib === 'undefined') {
+                progress.textContent = 'PDF support not available.';
+                return;
+            }
             const loadingTask = window.pdfjsLib.getDocument(url);
             loadingTask.promise.then(pdf => {
                 pdf.getPage(1).then(page => {
@@ -151,13 +177,18 @@
                         previewImg.src = canvas.toDataURL();
                         preview.appendChild(previewImg);
                         progress.textContent = '';
+                    }).catch(err => {
+                        progress.textContent = 'Error rendering PDF: ' + err.message;
                     });
+                }).catch(err => {
+                    progress.textContent = 'Error loading PDF: ' + err.message;
                 });
             }).catch(err => {
-                progress.textContent = 'Error loading PDF: ' + err.message;
+                progress.textContent = 'Error processing PDF: ' + err.message;
             });
         }
 
+        // OCR processing
         ocrBtn.onclick = async () => {
             if (!currentImageUrl) {
                 alert('Please upload an image or PDF first.');
@@ -166,15 +197,20 @@
             progress.textContent = 'Preprocessing image...';
             preprocessCanvas();
             progress.textContent = 'Initializing OCR...';
-            const worker = await Tesseract.createWorker('eng+hin', 1, {
-                logger: m => progress.textContent = `${m.status}: ${Math.round(m.progress * 100)}%`
-            });
-            const { data: { text } } = await worker.recognize(canvas);
-            textArea.value = text;
-            await worker.terminate();
-            progress.textContent = '';
+            try {
+                const worker = await Tesseract.createWorker('eng+hin', 1, {
+                    logger: m => progress.textContent = `${m.status}: ${Math.round(m.progress * 100)}%`
+                });
+                const { data: { text } } = await worker.recognize(canvas);
+                textArea.value = text;
+                await worker.terminate();
+                progress.textContent = 'OCR completed.';
+            } catch (err) {
+                progress.textContent = 'OCR error: ' + err.message;
+            }
         };
 
+        // Image preprocessing (grayscale, contrast, optional thresholding)
         function preprocessCanvas() {
             // Grayscale
             let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
@@ -210,17 +246,17 @@
             }
         }
 
+        // Kruti Dev to Unicode conversion
         convertBtn.onclick = () => {
             textArea.value = krutiToUnicode(textArea.value);
+            progress.textContent = 'Converted to Unicode.';
         };
 
-        // Kruti Dev to Unicode converter function (standard implementation with replace chain)
         function krutiToUnicode(text) {
-            text += ' '; // Add space for safety
-            text = text.replace(/([कखगघचछजझञटठडढणतथदधनपफबभमयरलवशषसहक़ख़ग़ज़ड़ढ़फ़य़ळ])([\ु0901])/g, "$2$1"); // Anusvar
+            text += ' ';
+            text = text.replace(/([कखगघचछजझञटठडढणतथदधनपफबभमयरलवशषसहक़ख़ग़ज़ड़ढ़फ़य़ळ])([\u0901])/g, "$2$1"); // Anusvar
             text = text.replace(/([कखगघचछजझञटठडढणतथदधनपफबभमयरलवशषसहक़ख़ग़ज़ड़ढ़फ़य़ळ])([\u0902])/g, "$2$1"); // Chandrabindu
-            text = text.replace(/([कखगघचछजझञटठडढणतथदधनपफबभमयरलवशषसहक़ख़ग़ज़ड़ढ़फ़य़ळ])(ं)/g, "ं$1"); 
-            text = text.replace(/([कखगघचछजझञटठडढणतथदधनपफबभमयरलवशषसहक़ख़ग़ज़ड़ढ़फ़य़ळ])(ं)/g, "ं$1"); 
+            text = text.replace(/([कखगघचछजझञटठडढणतथदधनपफबभमयरलवशषसहक़ख़ग़ज़ड़ढ़फ़य़ळ])(ं)/g, "ं$1");
             text = text.replace(/([कखगघचछजझञटठडढणतथदधनपफबभमयरलवशषसहक़ख़ग़ज़ड़ढ़फ़य़ळ])(ॅ)/g, "ॅ$1");
             text = text.replace(/([कखगघचछजझञटठडढणतथदधनपफबभमयरलवशषसहक़ख़ग़ज़ड़ढ़फ़य़ळ])(ॉ)/g, "ॉ$1");
             text = text.replace(/([कखगघचछजझञटठडढणतथदधनपफबभमयरलवशषसहक़ख़ग़ज़ड़ढ़फ़य़ळ])ा/g, "ा$1");
@@ -229,13 +265,11 @@
             text = text.replace(/([कखगघचछजझञटठडढणतथदधनपफबभमयरलवशषसहक़ख़ग़ज़ड़ढ़फ़य़ळ])ु/g, "ु$1");
             text = text.replace(/([कखगघचछजझञटठडढणतथदधनपफबभमयरलवशषसहक़ख़ग़ज़ड़ढ़फ़य़ळ])ू/g, "ू$1");
             text = text.replace(/([कखगघचछजझञटठडढणतथदधनपफबभमयरलवशषसहक़ख़ग़ज़ड़ढ़फ़य़ळ])ृ/g, "ृ$1");
-            text = text.replace(/([कखगघचछजझञटठडढणतथदधनपफबभमयरलवशषसहक़ख़ग़ज़ड़ढ़फ़य़ळ])ॄ/g, "ॄ$1");
             text = text.replace(/([कखगघचछजझञटठडढणतथदधनपफबभमयरलवशषसहक़ख़ग़ज़ड़ढ़फ़य़ळ])े/g, "े$1");
             text = text.replace(/([कखगघचछजझञटठडढणतथदधनपफबभमयरलवशषसहक़ख़ग़ज़ड़ढ़फ़य़ळ])ै/g, "ै$1");
-            text = text.replace(/([कखगघचछजझञटठडढणतथदधनपफबभमयरलवशषसहक़ख़ग़ज़ड़ढ़फ़य़ळ])ो/g, "ो$1");
+            text = text.replace(/([कखगघचछजझञटठडढणतथदधनपफब芮यरलवशषसहक़ख़ग़ज़ड़ढ़फ़य़ळ])ो/g, "ो$1");
             text = text.replace(/([कखगघचछजझञटठडढणतथदधनपफबभमयरलवशषसहक़ख़ग़ज़ड़ढ़फ़य़ळ])ौ/g, "ौ$1");
 
-            // Specific mappings for Kruti Dev characters
             text = text.replace(/É/g, 'क़');
             text = text.replace(/ç/g, 'फ़');
             text = text.replace(/ƒ/g, 'ज़');
@@ -244,62 +278,12 @@
             text = text.replace(/Ä/g, 'ढ़');
             text = text.replace(/Æ/g, 'झ़');
             text = text.replace(/È/g, 'क़');
-            text = text.replace(//g, 'य़');
-            text = text.replace(/Ì/g, 'ऱ');
             text = text.replace(//g, 'ड़');
             text = text.replace(/Ñ/g, 'ळ');
-
             text = text.replace(/Ê/g, 'क्ष');
             text = text.replace(/ë/g, 'त्र');
             text = text.replace(//g, 'ज्ञ');
-
             text = text.replace(/„/g, 'श्र');
-
-            text = text.replace(/‹/g, 'ङ');
-            text = text.replace(//g, 'ड़');
-            text = text.replace(//g, 'ढ़');
-
-            text = text.replace(/Þ/g, 'क');
-            text = text.replace(/ß/g, 'ख');
-            text = text.replace(/à/g, 'ग');
-            text = text.replace(/á/g, 'घ');
-            text = text.replace(/â/g, 'ङ');
-            text = text.replace(/ã/g, 'च');
-            text = text.replace(/ä/g, 'छ');
-            text = text.replace(/å/g, 'ज');
-            text = text.replace(/æ/g, 'झ');
-            text = text.replace(/ç/g, 'ञ');
-            text = text.replace(/è/g, 'ट');
-            text = text.replace(/é/g, 'ठ');
-            text = text.replace(/ê/g, 'ड');
-            text = text.replace(/ë/g, 'ढ');
-            text = text.replace(/ì/g, 'ण');
-            text = text.replace(/í/g, 'त');
-            text = text.replace(/î/g, 'थ');
-            text = text.replace(/ï/g, 'द');
-            text = text.replace(/ð/g, 'ध');
-            text = text.replace(/ñ/g, 'न');
-            text = text.replace(/ò/g, 'प');
-            text = text.replace(/ó/g, 'फ');
-            text = text.replace(/ô/g, 'ब');
-            text = text.replace(/õ/g, 'भ');
-            text = text.replace(/ö/g, 'म');
-            text = text.replace(/÷/g, 'य');
-            text = text.replace(/ø/g, 'र');
-            text = text.replace(/ù/g, 'ल');
-            text = text.replace(/ú/g, 'ळ');
-            text = text.replace(/û/g, 'व');
-            text = text.replace(/ü/g, 'श');
-            text = text.replace(/ý/g, 'ष');
-            text = text.replace(/þ/g, 'स');
-            text = text.replace(/ÿ/g, 'ह');
-
-            text = text.replace(/¡/g, 'ॐ');
-            text = text.replace(/¦/g, 'ऽ');
-            text = text.replace(/¨/g, '्र');
-            text = text.replace(/ª/g, 'र्');
-            text = text.replace(/­/g, '़');
-
             text = text.replace(/A/g, 'अ');
             text = text.replace(/B/g, 'आ');
             text = text.replace(/C/g, 'इ');
@@ -307,9 +291,7 @@
             text = text.replace(/E/g, 'उ');
             text = text.replace(/F/g, 'ऊ');
             text = text.replace(/G/g, 'ऋ');
-            text = text.replace(/ß/g, 'ॠ'); // Adjust if needed
             text = text.replace(/H/g, 'ऌ');
-            text = text.replace(//g, 'ॡ');
             text = text.replace(/I/g, 'ऍ');
             text = text.replace(/J/g, 'ऐ');
             text = text.replace(/K/g, 'ऑ');
@@ -317,12 +299,6 @@
             text = text.replace(/M/g, 'औ');
             text = text.replace(/N/g, 'अं');
             text = text.replace(/O/g, 'अः');
-            text = text.replace(//g, 'ऋ'); // Adjust
-
-            // More matra adjustments if needed
-            text = text.replace(/½/g, 'य़'); // Example
-
-            // Numbers
             text = text.replace(/0/g, '०');
             text = text.replace(/1/g, '१');
             text = text.replace(/2/g, '२');
@@ -334,28 +310,47 @@
             text = text.replace(/8/g, '८');
             text = text.replace(/9/g, '९');
 
-            text = text.trim(); // Remove added space
+            text = text.trim();
             return text;
         }
 
+        // Export as PDF
         exportPdfBtn.onclick = () => {
+            if (!textArea.value) {
+                alert('No text to export.');
+                return;
+            }
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-            const lines = doc.splitTextToSize(textArea.value, 180); // Split for multi-line
+            const lines = doc.splitTextToSize(textArea.value, 180);
             doc.text(lines, 10, 10);
             doc.save('document.pdf');
-            // Note: Hindi characters may appear as boxes if font not supported; for full support, custom font needed.
+            progress.textContent = 'PDF exported.';
         };
 
+        // Export as Word (.doc)
         exportWordBtn.onclick = () => {
+            if (!textArea.value) {
+                alert('No text to export.');
+                return;
+            }
             const blob = new Blob([textArea.value], { type: 'application/msword' });
             saveAs(blob, 'document.doc');
+            progress.textContent = 'Word document exported.';
         };
 
+        // Voice typing
         let recognition = null;
         voiceBtn.onclick = () => {
             if (!('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) {
                 alert('Web Speech API not supported in this browser.');
+                return;
+            }
+            if (recognition) {
+                recognition.stop();
+                recognition = null;
+                voiceBtn.textContent = 'Voice Typing';
+                progress.textContent = 'Voice typing stopped.';
                 return;
             }
             recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
@@ -373,8 +368,12 @@
             };
             recognition.onend = () => {
                 recognition = null;
+                voiceBtn.textContent = 'Voice Typing';
+                progress.textContent = 'Voice typing stopped.';
             };
             recognition.start();
+            voiceBtn.textContent = 'Stop Voice Typing';
+            progress.textContent = 'Voice typing started...';
         };
 
         function insertTextAtCursor(text) {
