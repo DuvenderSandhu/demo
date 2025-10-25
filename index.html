@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EasyDocs - Simple Document Editor</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/7.1.0/docx.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <style>
         :root {
             --primary-color: #4a6fa5;
@@ -127,7 +131,7 @@
             padding: 30px;
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
-            font-size: 1.2rem;
+            font-size: 16px;
             line-height: 1.8;
             outline: none;
             border: 1px solid #ddd;
@@ -239,29 +243,36 @@
             width: 100%;
             margin: 10px 0;
             position: relative;
-            table-layout: fixed;
         }
 
         table, th, td {
-            border: 1px solid #ddd;
+            border: 2px solid #ddd;
         }
 
         th, td {
-            padding: 8px 12px;
+            padding: 12px;
             text-align: left;
             position: relative;
             min-height: 40px;
             word-wrap: break-word;
             overflow-wrap: break-word;
             vertical-align: top;
+            cursor: pointer;
+            min-width: 80px;
         }
 
         th {
             background-color: var(--light-color);
+            font-weight: bold;
         }
 
-        .selected-cell {
-            background-color: rgba(74, 111, 165, 0.2);
+        .table-cell.selected {
+            background-color: rgba(74, 111, 165, 0.3) !important;
+            border: 2px solid var(--primary-color) !important;
+        }
+
+        .table-cell {
+            position: relative;
         }
 
         .cell-voice-btn {
@@ -282,55 +293,8 @@
             z-index: 10;
         }
 
-        td:hover .cell-voice-btn {
+        .table-cell:hover .cell-voice-btn {
             display: flex;
-        }
-
-        .resize-handle {
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            background-color: var(--primary-color);
-            border: 1px solid white;
-            z-index: 20;
-        }
-
-        .resize-handle.col {
-            top: 0;
-            bottom: 0;
-            width: 6px;
-            cursor: col-resize;
-        }
-
-        .resize-handle.row {
-            left: 0;
-            right: 0;
-            height: 6px;
-            cursor: row-resize;
-        }
-
-        .resize-handle.col::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 1px;
-            right: 1px;
-            height: 20px;
-            margin-top: -10px;
-            background-color: var(--primary-color);
-            border-radius: 2px;
-        }
-
-        .resize-handle.row::after {
-            content: '';
-            position: absolute;
-            left: 50%;
-            top: 1px;
-            bottom: 1px;
-            width: 20px;
-            margin-left: -10px;
-            background-color: var(--primary-color);
-            border-radius: 2px;
         }
 
         /* Image Styles */
@@ -340,72 +304,175 @@
             margin: 10px 0;
             position: relative;
             display: inline-block;
-            cursor: move;
+            cursor: pointer;
+            border: 2px dashed transparent;
+            transition: border-color 0.3s;
+        }
+
+        .editor-image:hover {
+            border-color: var(--primary-color);
         }
 
         .editor-image.selected {
             outline: 2px solid var(--primary-color);
         }
 
-        .image-resize-handle {
+        .resize-handle {
             position: absolute;
             width: 12px;
             height: 12px;
             background-color: var(--primary-color);
-            border: 1px solid white;
+            border: 2px solid white;
+            border-radius: 50%;
             z-index: 20;
-        }
-
-        .image-resize-handle.top-left {
-            top: -6px;
-            left: -6px;
-            cursor: nwse-resize;
-        }
-
-        .image-resize-handle.top-right {
-            top: -6px;
-            right: -6px;
-            cursor: nesw-resize;
-        }
-
-        .image-resize-handle.bottom-left {
-            bottom: -6px;
-            left: -6px;
-            cursor: nesw-resize;
-        }
-
-        .image-resize-handle.bottom-right {
-            bottom: -6px;
-            right: -6px;
-            cursor: nwse-resize;
-        }
-
-        /* Draggable element styles */
-        .draggable {
-            cursor: move;
-            position: relative;
-        }
-
-        .draggable.selected {
-            outline: 2px dashed var(--primary-color);
-        }
-
-        .drag-handle {
-            position: absolute;
-            top: 5px;
-            left: 5px;
-            background: var(--primary-color);
-            color: white;
-            border-radius: 4px;
-            padding: 2px 6px;
-            font-size: 12px;
-            cursor: move;
-            z-index: 30;
             display: none;
         }
 
-        .draggable:hover .drag-handle {
+        .editor-image.selected .resize-handle {
             display: block;
+        }
+
+        .resize-handle.top-left {
+            top: -6px;
+            left: -6px;
+            cursor: nwse-resize;
+        }
+
+        .resize-handle.top-right {
+            top: -6px;
+            right: -6px;
+            cursor: nesw-resize;
+        }
+
+        .resize-handle.bottom-left {
+            bottom: -6px;
+            left: -6px;
+            cursor: nesw-resize;
+        }
+
+        .resize-handle.bottom-right {
+            bottom: -6px;
+            right: -6px;
+            cursor: nwse-resize;
+        }
+
+        /* Voice Modal */
+        .voice-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            z-index: 1001;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .voice-modal h3 {
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+
+        .voice-status {
+            padding: 15px;
+            background: var(--light-color);
+            border-radius: var(--border-radius);
+            margin: 15px 0;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .voice-status.recording {
+            background: #ffeaa7;
+            color: #d63031;
+        }
+
+        .voice-text {
+            min-height: 100px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin: 15px 0;
+            font-size: 1rem;
+            text-align: left;
+            background: #f8f9fa;
+        }
+
+        .voice-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        /* Permission Modal */
+        .permission-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            z-index: 1002;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .permission-modal i {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        /* Image Size Modal */
+        .image-size-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            z-index: 1001;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .size-inputs {
+            display: flex;
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .size-input {
+            flex: 1;
+        }
+
+        .size-input label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .size-input input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
         }
 
         /* Responsive Design */
@@ -437,8 +504,8 @@
                 </div>
                 
                 <div class="toolbar-group">
-                    <button class="toolbar-button" id="font-increase" title="Increase Font Size"><i class="fas fa-search-plus"></i></button>
-                    <button class="toolbar-button" id="font-decrease" title="Decrease Font Size"><i class="fas fa-search-minus"></i></button>
+                    <button class="toolbar-button" id="font-increase" title="Increase Font Size"><i class="fas fa-plus"></i> A+</button>
+                    <button class="toolbar-button" id="font-decrease" title="Decrease Font Size"><i class="fas fa-minus"></i> A-</button>
                 </div>
                 
                 <div class="toolbar-group">
@@ -455,22 +522,23 @@
                 </div>
                 
                 <div class="toolbar-group">
-                    <button class="toolbar-button" id="insert-image" title="Insert Image"><i class="fas fa-image"></i></button>
-                    <button class="toolbar-button" id="insert-table" title="Insert Table"><i class="fas fa-table"></i></button>
+                    <button class="toolbar-button" id="insert-image" title="Insert Image"><i class="fas fa-image"></i> Image</button>
+                    <button class="toolbar-button" id="image-size" title="Adjust Image Size"><i class="fas fa-expand"></i> Size</button>
+                    <button class="toolbar-button" id="insert-table" title="Insert Table"><i class="fas fa-table"></i> Table</button>
                 </div>
                 
                 <div class="toolbar-group">
-                    <button class="toolbar-button" id="merge-cells" title="Merge Cells"><i class="fas fa-object-group"></i></button>
-                    <button class="toolbar-button" id="split-cells" title="Split Cells"><i class="fas fa-object-ungroup"></i></button>
+                    <button class="toolbar-button" id="merge-cells" title="Merge Cells"><i class="fas fa-object-group"></i> Merge</button>
+                    <button class="toolbar-button" id="split-cells" title="Split Cells"><i class="fas fa-object-ungroup"></i> Split</button>
                 </div>
                 
                 <div class="toolbar-group">
-                    <button class="toolbar-button voice" id="voice-btn" title="Voice Typing"><i class="fas fa-microphone"></i></button>
+                    <button class="toolbar-button voice" id="voice-btn" title="Voice Typing"><i class="fas fa-microphone"></i> Voice Type</button>
                 </div>
                 
                 <div class="toolbar-group">
-                    <button class="toolbar-button export" id="export-pdf" title="Export as PDF"><i class="fas fa-file-pdf"></i></button>
-                    <button class="toolbar-button export" id="export-docx" title="Export as Word"><i class="fas fa-file-word"></i></button>
+                    <button class="toolbar-button export" id="export-pdf" title="Export as PDF"><i class="fas fa-file-pdf"></i> PDF</button>
+                    <button class="toolbar-button export" id="export-docx" title="Export as Word"><i class="fas fa-file-word"></i> Word</button>
                 </div>
             </div>
             
@@ -479,12 +547,13 @@
                 <div id="editor" contenteditable="true">
                     <h1>Welcome to EasyDocs</h1>
                     <p>This is your new document. Start typing here or use the toolbar above to format your text.</p>
-                    <p>You can:</p>
+                    <p><strong>Try these features:</strong></p>
                     <ul>
-                        <li>Change text style and color</li>
-                        <li>Insert images and tables</li>
-                        <li>Use voice typing</li>
-                        <li>Save your document as PDF or Word file</li>
+                        <li>Select text and use A+ or A- to change font size</li>
+                        <li>Click "Table" to insert a table (try 3 rows, 1 column)</li>
+                        <li>Click on table cells to select them, then click Merge</li>
+                        <li>Click "Image" to insert and resize images</li>
+                        <li>Use "Voice Type" for hands-free typing</li>
                     </ul>
                     <p>Have fun creating!</p>
                 </div>
@@ -501,7 +570,7 @@
     <!-- Table Creation Modal -->
     <div class="modal" id="table-modal">
         <div class="modal-content">
-            <h2>Create Table</h2>
+            <h2><i class="fas fa-table"></i> Create Table</h2>
             <div class="modal-input-group">
                 <label for="table-rows">Number of Rows:</label>
                 <input type="number" id="table-rows" min="1" max="20" value="3">
@@ -514,6 +583,67 @@
                 <button class="modal-button secondary" id="table-cancel">Cancel</button>
                 <button class="modal-button primary" id="table-insert">Insert Table</button>
             </div>
+        </div>
+    </div>
+    
+    <!-- Split Cell Modal -->
+    <div class="modal" id="split-modal">
+        <div class="modal-content">
+            <h2><i class="fas fa-object-ungroup"></i> Split Cell</h2>
+            <div class="modal-input-group">
+                <label for="split-rows">Number of Rows:</label>
+                <input type="number" id="split-rows" min="1" max="10" value="1">
+            </div>
+            <div class="modal-input-group">
+                <label for="split-cols">Number of Columns:</label>
+                <input type="number" id="split-cols" min="1" max="10" value="2">
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-button secondary" id="split-cancel">Cancel</button>
+                <button class="modal-button primary" id="split-insert">Split Cell</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Image Size Modal -->
+    <div class="image-size-modal" id="image-size-modal">
+        <h2><i class="fas fa-expand"></i> Adjust Image Size</h2>
+        <div class="size-inputs">
+            <div class="size-input">
+                <label for="image-width">Width (px):</label>
+                <input type="number" id="image-width" min="50" max="2000" value="300">
+            </div>
+            <div class="size-input">
+                <label for="image-height">Height (px):</label>
+                <input type="number" id="image-height" min="50" max="2000" value="200">
+            </div>
+        </div>
+        <div class="modal-buttons">
+            <button class="modal-button secondary" id="size-cancel">Cancel</button>
+            <button class="modal-button primary" id="size-apply">Apply Size</button>
+        </div>
+    </div>
+    
+    <!-- Voice Permission Modal -->
+    <div class="permission-modal" id="permission-modal">
+        <i class="fas fa-microphone"></i>
+        <h3>Voice Typing Permission</h3>
+        <p>EasyDocs needs access to your microphone for voice typing.</p>
+        <p>Click "Allow" when the browser asks for microphone permission.</p>
+        <div class="modal-buttons">
+            <button class="modal-button primary" id="permission-ok">OK, I Understand</button>
+        </div>
+    </div>
+    
+    <!-- Voice Typing Modal -->
+    <div class="voice-modal" id="voice-modal">
+        <h3><i class="fas fa-microphone"></i> Voice Typing</h3>
+        <div class="voice-status" id="voice-status-text">Click "Start Recording" to begin</div>
+        <div class="voice-text" id="voice-text">Your speech will appear here...</div>
+        <div class="voice-buttons">
+            <button class="modal-button secondary" id="voice-cancel">Cancel</button>
+            <button class="modal-button" id="voice-record"><i class="fas fa-microphone"></i> Start Recording</button>
+            <button class="modal-button primary" id="voice-insert">Insert Text</button>
         </div>
     </div>
     
@@ -532,6 +662,7 @@
         const alignCenterBtn = document.getElementById('align-center');
         const alignRightBtn = document.getElementById('align-right');
         const insertImageBtn = document.getElementById('insert-image');
+        const imageSizeBtn = document.getElementById('image-size');
         const insertTableBtn = document.getElementById('insert-table');
         const mergeCellsBtn = document.getElementById('merge-cells');
         const splitCellsBtn = document.getElementById('split-cells');
@@ -541,72 +672,88 @@
         const tableModal = document.getElementById('table-modal');
         const tableInsertBtn = document.getElementById('table-insert');
         const tableCancelBtn = document.getElementById('table-cancel');
+        const splitModal = document.getElementById('split-modal');
+        const splitInsertBtn = document.getElementById('split-insert');
+        const splitCancelBtn = document.getElementById('split-cancel');
+        const imageSizeModal = document.getElementById('image-size-modal');
+        const sizeApplyBtn = document.getElementById('size-apply');
+        const sizeCancelBtn = document.getElementById('size-cancel');
         const wordCount = document.getElementById('word-count');
         const voiceStatus = document.getElementById('voice-status');
+        const voiceModal = document.getElementById('voice-modal');
+        const voiceText = document.getElementById('voice-text');
+        const voiceCancel = document.getElementById('voice-cancel');
+        const voiceRecord = document.getElementById('voice-record');
+        const voiceInsert = document.getElementById('voice-insert');
+        const permissionModal = document.getElementById('permission-modal');
+        const permissionOk = document.getElementById('permission-ok');
+        const voiceStatusText = document.getElementById('voice-status-text');
 
-        // Speech Recognition
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        // Global variables
         let recognition = null;
         let isListening = false;
-        let currentVoiceTarget = null;
+        let cursorPosition = null;
+        let selectedCells = [];
+        let selectedImage = null;
 
-        // Dragging state
-        let isDragging = false;
-        let dragElement = null;
-        let dragOffsetX, dragOffsetY;
+        // Initialize speech recognition
+        function initSpeechRecognition() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (SpeechRecognition) {
+                recognition = new SpeechRecognition();
+                recognition.continuous = true;
+                recognition.interimResults = true;
+                recognition.lang = 'en-US';
 
-        // Resizing state
-        let isResizing = false;
-        let resizeElement = null;
-        let resizeHandle = null;
-        let startWidth, startHeight, startX, startY;
+                recognition.onresult = function(event) {
+                    let finalTranscript = '';
+                    let interimTranscript = '';
 
-        if (SpeechRecognition) {
-            recognition = new SpeechRecognition();
-            recognition.continuous = false;
-            recognition.interimResults = false;
-            recognition.lang = 'en-US';
-
-            recognition.onresult = function(event) {
-                const transcript = event.results[0][0].transcript;
-                
-                if (currentVoiceTarget) {
-                    // Insert text into the specific table cell
-                    if (currentVoiceTarget.tagName === 'TD' || currentVoiceTarget.tagName === 'TH') {
-                        currentVoiceTarget.textContent += transcript + ' ';
-                    } else {
-                        // Insert at cursor position in editor
-                        insertTextAtCursor(transcript);
+                    for (let i = event.resultIndex; i < event.results.length; i++) {
+                        const transcript = event.results[i][0].transcript;
+                        if (event.results[i].isFinal) {
+                            finalTranscript += transcript;
+                        } else {
+                            interimTranscript += transcript;
+                        }
                     }
-                } else {
-                    // Insert at cursor position in editor
-                    insertTextAtCursor(transcript);
-                }
-                
-                voiceStatus.textContent = 'Voice: Text added';
-                setTimeout(() => {
-                    if (!isListening) voiceStatus.textContent = 'Voice: Ready';
-                }, 2000);
-            };
 
-            recognition.onerror = function(event) {
-                console.error('Speech recognition error', event.error);
-                voiceStatus.textContent = 'Voice: Error';
-                voiceBtn.classList.remove('recording');
-                isListening = false;
-            };
+                    // Update voice text area
+                    voiceText.innerHTML = finalTranscript + '<span style="color: #666;">' + interimTranscript + '</span>';
+                };
 
-            recognition.onend = function() {
-                voiceBtn.classList.remove('recording');
-                isListening = false;
-                if (voiceStatus.textContent !== 'Voice: Text added') {
-                    voiceStatus.textContent = 'Voice: Ready';
-                }
-            };
-        } else {
-            voiceBtn.disabled = true;
-            voiceBtn.title = 'Speech recognition not supported';
-            voiceStatus.textContent = 'Voice: Not Supported';
+                recognition.onerror = function(event) {
+                    console.error('Speech recognition error', event.error);
+                    voiceStatusText.textContent = 'Error: ' + event.error;
+                    voiceStatusText.className = 'voice-status';
+                    isListening = false;
+                    voiceRecord.innerHTML = '<i class="fas fa-microphone"></i> Start Recording';
+                };
+
+                recognition.onend = function() {
+                    if (isListening) {
+                        recognition.start();
+                    }
+                };
+            }
+        }
+
+        // Save cursor position before opening voice modal
+        function saveCursorPosition() {
+            const selection = window.getSelection();
+            if (selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                cursorPosition = range.cloneRange();
+            }
+        }
+
+        // Restore cursor position after voice input
+        function restoreCursorPosition() {
+            if (cursorPosition) {
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(cursorPosition);
+            }
         }
 
         // Formatting Functions
@@ -622,14 +769,92 @@
             document.execCommand('underline', false, null);
         });
 
-        // Font size controls
+        // Fixed Font size controls
         fontIncreaseBtn.addEventListener('click', () => {
-            document.execCommand('increaseFontSize', false, null);
+            const selection = window.getSelection();
+            if (selection.rangeCount > 0 && selection.toString().length > 0) {
+                const range = selection.getRangeAt(0);
+                const selectedText = range.toString();
+                
+                // Get current font size or use default
+                let currentSize = 16;
+                const parentElement = range.commonAncestorContainer.parentElement;
+                if (parentElement && parentElement.style.fontSize) {
+                    currentSize = parseInt(parentElement.style.fontSize);
+                }
+                
+                // Increase font size
+                const newSize = Math.min(currentSize + 2, 72);
+                
+                // Create span with new font size
+                const span = document.createElement('span');
+                span.style.fontSize = newSize + 'px';
+                span.textContent = selectedText;
+                
+                // Replace selected text with styled span
+                range.deleteContents();
+                range.insertNode(span);
+            } else {
+                // If no text selected, apply to the whole paragraph
+                const blockElement = getBlockElement(selection.anchorNode);
+                if (blockElement) {
+                    let currentSize = parseInt(window.getComputedStyle(blockElement).fontSize) || 16;
+                    const newSize = Math.min(currentSize + 2, 72);
+                    blockElement.style.fontSize = newSize + 'px';
+                }
+            }
         });
 
         fontDecreaseBtn.addEventListener('click', () => {
-            document.execCommand('decreaseFontSize', false, null);
+            const selection = window.getSelection();
+            if (selection.rangeCount > 0 && selection.toString().length > 0) {
+                const range = selection.getRangeAt(0);
+                const selectedText = range.toString();
+                
+                // Get current font size or use default
+                let currentSize = 16;
+                const parentElement = range.commonAncestorContainer.parentElement;
+                if (parentElement && parentElement.style.fontSize) {
+                    currentSize = parseInt(parentElement.style.fontSize);
+                }
+                
+                // Decrease font size
+                const newSize = Math.max(currentSize - 2, 8);
+                
+                // Create span with new font size
+                const span = document.createElement('span');
+                span.style.fontSize = newSize + 'px';
+                span.textContent = selectedText;
+                
+                // Replace selected text with styled span
+                range.deleteContents();
+                range.insertNode(span);
+            } else {
+                // If no text selected, apply to the whole paragraph
+                const blockElement = getBlockElement(selection.anchorNode);
+                if (blockElement) {
+                    let currentSize = parseInt(window.getComputedStyle(blockElement).fontSize) || 16;
+                    const newSize = Math.max(currentSize - 2, 8);
+                    blockElement.style.fontSize = newSize + 'px';
+                }
+            }
         });
+
+        // Helper function to get block element
+        function getBlockElement(node) {
+            while (node && node !== editor) {
+                if (node.nodeType === Node.ELEMENT_NODE && 
+                    (node.tagName === 'P' || node.tagName === 'DIV' || 
+                     node.tagName === 'H1' || node.tagName === 'H2' || 
+                     node.tagName === 'H3' || node.tagName === 'H4' || 
+                     node.tagName === 'H5' || node.tagName === 'H6' || 
+                     node.tagName === 'LI')) {
+                    return node;
+                }
+                node = node.parentNode;
+            }
+            return null;
+        }
 
         textColor.addEventListener('input', () => {
             document.execCommand('foreColor', false, textColor.value);
@@ -651,7 +876,7 @@
             document.execCommand('justifyRight', false, null);
         });
 
-        // Insert Image
+        // Insert Image with resize handles
         insertImageBtn.addEventListener('click', () => {
             const input = document.createElement('input');
             input.type = 'file';
@@ -664,25 +889,58 @@
                     reader.onload = (event) => {
                         const img = document.createElement('img');
                         img.src = event.target.result;
-                        img.className = 'editor-image draggable';
+                        img.className = 'editor-image';
+                        img.style.width = '300px';
+                        img.style.height = 'auto';
                         
                         // Add resize handles
                         addImageResizeHandles(img);
                         
-                        // Add drag handle
-                        addDragHandle(img);
+                        // Make image selectable
+                        img.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            clearSelections();
+                            img.classList.add('selected');
+                            selectedImage = img;
+                            
+                            // Update image size modal with current dimensions
+                            document.getElementById('image-width').value = parseInt(img.style.width) || img.naturalWidth;
+                            document.getElementById('image-height').value = parseInt(img.style.height) || img.naturalHeight;
+                        });
                         
                         // Insert at cursor position
                         insertElementAtCursor(img);
-                        
-                        // Make image draggable
-                        makeElementDraggable(img);
                     };
                     reader.readAsDataURL(file);
                 }
             };
             
             input.click();
+        });
+
+        // Image size adjustment modal
+        imageSizeBtn.addEventListener('click', () => {
+            if (selectedImage) {
+                imageSizeModal.style.display = 'block';
+            } else {
+                alert('Please select an image first by clicking on it.');
+            }
+        });
+
+        sizeApplyBtn.addEventListener('click', () => {
+            if (selectedImage) {
+                const width = document.getElementById('image-width').value;
+                const height = document.getElementById('image-height').value;
+                
+                selectedImage.style.width = width + 'px';
+                selectedImage.style.height = height + 'px';
+                
+                imageSizeModal.style.display = 'none';
+            }
+        });
+
+        sizeCancelBtn.addEventListener('click', () => {
+            imageSizeModal.style.display = 'none';
         });
 
         // Add resize handles to image
@@ -694,62 +952,69 @@
                 { position: 'bottom-right', cursor: 'nwse-resize' }
             ];
             
+            let isResizing = false;
+            let startWidth, startHeight, startX, startY, handlePosition;
+            
             handles.forEach(handle => {
                 const resizeHandle = document.createElement('div');
-                resizeHandle.className = `image-resize-handle ${handle.position}`;
+                resizeHandle.className = `resize-handle ${handle.position}`;
                 resizeHandle.style.cursor = handle.cursor;
                 img.appendChild(resizeHandle);
                 
                 // Add resize functionality
-                makeImageResizable(img, resizeHandle, handle.position);
+                resizeHandle.addEventListener('mousedown', (e) => {
+                    isResizing = true;
+                    handlePosition = handle.position;
+                    startX = e.clientX;
+                    startY = e.clientY;
+                    startWidth = parseInt(document.defaultView.getComputedStyle(img).width, 10) || img.naturalWidth;
+                    startHeight = parseInt(document.defaultView.getComputedStyle(img).height, 10) || img.naturalHeight;
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    document.addEventListener('mousemove', resize);
+                    document.addEventListener('mouseup', stopResize);
+                });
             });
-        }
-
-        // Make images resizable
-        function makeImageResizable(img, handle, position) {
-            handle.addEventListener('mousedown', (e) => {
-                isResizing = true;
-                resizeElement = img;
-                resizeHandle = handle;
-                startX = e.clientX;
-                startY = e.clientY;
-                startWidth = parseInt(document.defaultView.getComputedStyle(img).width, 10);
-                startHeight = parseInt(document.defaultView.getComputedStyle(img).height, 10);
-                e.preventDefault();
-                document.body.style.userSelect = 'none';
-            });
-        }
-
-        // Add drag handle to element
-        function addDragHandle(element) {
-            const dragHandle = document.createElement('div');
-            dragHandle.className = 'drag-handle';
-            dragHandle.innerHTML = '<i class="fas fa-arrows-alt"></i>';
-            element.appendChild(dragHandle);
-        }
-
-        // Make elements draggable
-        function makeElementDraggable(element) {
-            element.addEventListener('mousedown', (e) => {
-                // Don't start drag if clicking on resize handle
-                if (e.target.classList.contains('image-resize-handle') || 
-                    e.target.classList.contains('resize-handle')) {
-                    return;
+            
+            function resize(e) {
+                if (!isResizing) return;
+                
+                const dx = e.clientX - startX;
+                const dy = e.clientY - startY;
+                
+                let newWidth = startWidth;
+                let newHeight = startHeight;
+                
+                if (handlePosition.includes('right')) {
+                    newWidth = startWidth + dx;
+                }
+                if (handlePosition.includes('left')) {
+                    newWidth = startWidth - dx;
+                }
+                if (handlePosition.includes('bottom')) {
+                    newHeight = startHeight + dy;
+                }
+                if (handlePosition.includes('top')) {
+                    newHeight = startHeight - dy;
                 }
                 
-                isDragging = true;
-                dragElement = element;
-                dragOffsetX = e.offsetX;
-                dragOffsetY = e.offsetY;
+                // Set minimum size
+                newWidth = Math.max(newWidth, 50);
+                newHeight = Math.max(newHeight, 50);
                 
-                // Set position absolute for dragging
-                element.style.position = 'absolute';
-                element.style.zIndex = '1000';
-                document.body.style.userSelect = 'none';
-            });
+                img.style.width = newWidth + 'px';
+                img.style.height = newHeight + 'px';
+            }
+            
+            function stopResize() {
+                isResizing = false;
+                document.removeEventListener('mousemove', resize);
+                document.removeEventListener('mouseup', stopResize);
+            }
         }
 
-        // Insert Table
+        // Insert Table - Fixed implementation
         insertTableBtn.addEventListener('click', () => {
             tableModal.style.display = 'flex';
         });
@@ -763,23 +1028,13 @@
             const cols = parseInt(document.getElementById('table-cols').value) || 3;
             
             const table = document.createElement('table');
-            table.className = 'draggable';
-            
-            // Create column group for consistent column sizing
-            const colgroup = document.createElement('colgroup');
-            for (let j = 0; j < cols; j++) {
-                const col = document.createElement('col');
-                col.style.width = `${100/cols}%`;
-                colgroup.appendChild(col);
-            }
-            table.appendChild(colgroup);
-            
             for (let i = 0; i < rows; i++) {
                 const tr = document.createElement('tr');
                 for (let j = 0; j < cols; j++) {
                     const cell = document.createElement('td');
+                    cell.className = 'table-cell';
                     cell.contentEditable = true;
-                    cell.innerHTML = '&nbsp;';
+                    cell.innerHTML = 'Cell ' + (i + 1) + ',' + (j + 1);
                     
                     // Add voice button to each cell
                     const voiceBtn = document.createElement('button');
@@ -789,276 +1044,255 @@
                     
                     voiceBtn.addEventListener('click', (e) => {
                         e.stopPropagation();
-                        currentVoiceTarget = cell;
+                        saveCursorPosition();
+                        voiceModal.style.display = 'block';
                         startVoiceInput();
                     });
                     
                     cell.appendChild(voiceBtn);
+                    
+                    // Add cell selection
+                    cell.addEventListener('click', (e) => {
+                        if (e.ctrlKey || e.metaKey) {
+                            // Multi-select with Ctrl/Cmd key
+                            cell.classList.toggle('selected');
+                            if (cell.classList.contains('selected')) {
+                                if (!selectedCells.includes(cell)) {
+                                    selectedCells.push(cell);
+                                }
+                            } else {
+                                const index = selectedCells.indexOf(cell);
+                                if (index > -1) {
+                                    selectedCells.splice(index, 1);
+                                }
+                            }
+                        } else {
+                            // Single select
+                            clearSelections();
+                            cell.classList.add('selected');
+                            selectedCells = [cell];
+                        }
+                        e.stopPropagation();
+                    });
+                    
                     tr.appendChild(cell);
                 }
                 table.appendChild(tr);
             }
             
-            // Add column resize handles
-            addTableColumnResizeHandles(table);
-            
-            // Add row resize handles
-            addTableRowResizeHandles(table);
-            
-            // Add drag handle
-            addDragHandle(table);
-            
-            // Add table selection functionality
-            table.addEventListener('click', (e) => {
-                if (e.target.tagName === 'TD' || e.target.tagName === 'TH') {
-                    // Clear previous selection
-                    const selected = editor.querySelector('.selected-cell');
-                    if (selected) selected.classList.remove('selected-cell');
-                    
-                    // Select current cell
-                    e.target.classList.add('selected-cell');
-                }
-            });
-            
-            // Make table draggable
-            makeElementDraggable(table);
-            
             insertElementAtCursor(table);
             tableModal.style.display = 'none';
         });
 
-        // Add column resize handles to table
-        function addTableColumnResizeHandles(table) {
-            const cols = table.querySelectorAll('col');
+        // Clear all selections
+        function clearSelections() {
+            // Clear table cell selections
+            const selected = editor.querySelectorAll('.selected, .table-cell.selected');
+            selected.forEach(el => el.classList.remove('selected'));
+            selectedCells = [];
             
-            cols.forEach((col, index) => {
-                if (index < cols.length - 1) {
-                    const handle = document.createElement('div');
-                    handle.className = 'resize-handle col';
-                    handle.style.right = '0';
-                    table.appendChild(handle);
-                    
-                    // Position the handle between columns
-                    const rect = table.getBoundingClientRect();
-                    const colWidth = rect.width / cols.length;
-                    handle.style.left = `${(index + 1) * colWidth - 3}px`;
-                    
-                    // Add resize functionality
-                    handle.addEventListener('mousedown', (e) => {
-                        isResizing = true;
-                        resizeElement = table;
-                        resizeHandle = handle;
-                        startX = e.clientX;
-                        startWidth = parseFloat(col.style.width) || (100 / cols.length);
-                        e.preventDefault();
-                        document.body.style.userSelect = 'none';
-                    });
-                }
-            });
+            // Clear image selections
+            const selectedImages = editor.querySelectorAll('.editor-image.selected');
+            selectedImages.forEach(img => img.classList.remove('selected'));
+            selectedImage = null;
         }
 
-        // Add row resize handles to table
-        function addTableRowResizeHandles(table) {
-            const rows = table.querySelectorAll('tr');
-            
-            rows.forEach((row, index) => {
-                if (index < rows.length - 1) {
-                    const handle = document.createElement('div');
-                    handle.className = 'resize-handle row';
-                    handle.style.bottom = '0';
-                    table.appendChild(handle);
-                    
-                    // Position the handle between rows
-                    const rect = table.getBoundingClientRect();
-                    const rowHeight = rect.height / rows.length;
-                    handle.style.top = `${(index + 1) * rowHeight - 3}px`;
-                    
-                    // Add resize functionality
-                    handle.addEventListener('mousedown', (e) => {
-                        isResizing = true;
-                        resizeElement = table;
-                        resizeHandle = handle;
-                        startY = e.clientY;
-                        // For rows, we'll adjust the height of the row
-                        e.preventDefault();
-                        document.body.style.userSelect = 'none';
-                    });
-                }
-            });
-        }
-
-        // Merge and Split Cells
-        mergeCellsBtn.addEventListener('click', () => {
-            const selectedCell = editor.querySelector('.selected-cell');
-            if (selectedCell) {
-                // Simple merge implementation
-                const table = selectedCell.closest('table');
-                if (table) {
-                    const row = selectedCell.parentElement;
-                    const cellIndex = Array.from(row.cells).indexOf(selectedCell);
-                    
-                    // Check if there's a cell to the right to merge with
-                    if (cellIndex < row.cells.length - 1) {
-                        const nextCell = row.cells[cellIndex + 1];
-                        selectedCell.colSpan = (selectedCell.colSpan || 1) + (nextCell.colSpan || 1);
-                        selectedCell.innerHTML += nextCell.innerHTML;
-                        row.removeChild(nextCell);
-                    }
-                }
-            } else {
-                alert('Please select a table cell first by clicking on it.');
+        // Clear selections when clicking outside
+        editor.addEventListener('click', (e) => {
+            if (!e.target.closest('.table-cell') && !e.target.closest('.editor-image')) {
+                clearSelections();
             }
         });
 
+        // Merge Cells - Fixed implementation
+        mergeCellsBtn.addEventListener('click', () => {
+            if (selectedCells.length > 1) {
+                // Sort cells by position
+                selectedCells.sort((a, b) => {
+                    const aRow = a.parentNode.rowIndex;
+                    const bRow = b.parentNode.rowIndex;
+                    if (aRow !== bRow) return aRow - bRow;
+                    return a.cellIndex - b.cellIndex;
+                });
+                
+                // Get the first cell
+                const firstCell = selectedCells[0];
+                
+                // Calculate rowspan and colspan
+                const rows = new Set(selectedCells.map(cell => cell.parentNode.rowIndex));
+                const cols = new Set(selectedCells.map(cell => cell.cellIndex));
+                
+                const rowspan = rows.size;
+                const colspan = cols.size;
+                
+                // Set rowspan and colspan
+                firstCell.rowSpan = rowspan;
+                firstCell.colSpan = colspan;
+                
+                // Move content from other cells to first cell
+                let combinedContent = firstCell.innerHTML;
+                for (let i = 1; i < selectedCells.length; i++) {
+                    combinedContent += '<br>' + selectedCells[i].innerHTML;
+                    selectedCells[i].parentNode.removeChild(selectedCells[i]);
+                }
+                
+                firstCell.innerHTML = combinedContent;
+                
+                // Clear selections
+                clearSelections();
+                firstCell.classList.add('selected');
+                selectedCells = [firstCell];
+            } else {
+                alert('Please select multiple cells to merge. Hold Ctrl/Cmd and click cells to select multiple.');
+            }
+        });
+
+        // Split Cells
         splitCellsBtn.addEventListener('click', () => {
-            const selectedCell = editor.querySelector('.selected-cell');
-            if (selectedCell && selectedCell.colSpan > 1) {
-                // Simple split implementation
-                const table = selectedCell.closest('table');
-                if (table) {
-                    const row = selectedCell.parentElement;
-                    const cellIndex = Array.from(row.cells).indexOf(selectedCell);
-                    
-                    // Split the cell
-                    const colSpan = selectedCell.colSpan;
-                    selectedCell.colSpan = 1;
-                    
-                    // Add additional cells
-                    for (let i = 1; i < colSpan; i++) {
+            if (selectedCells.length === 1) {
+                const cell = selectedCells[0];
+                splitModal.style.display = 'flex';
+                
+                // Store the cell to split
+                window.cellToSplit = cell;
+            } else {
+                alert('Please select a single cell to split.');
+            }
+        });
+
+        splitCancelBtn.addEventListener('click', () => {
+            splitModal.style.display = 'none';
+        });
+
+        splitInsertBtn.addEventListener('click', () => {
+            const cell = window.cellToSplit;
+            if (cell) {
+                const splitRows = parseInt(document.getElementById('split-rows').value) || 1;
+                const splitCols = parseInt(document.getElementById('split-cols').value) || 2;
+                
+                const row = cell.parentNode;
+                const table = row.parentNode;
+                const cellIndex = Array.from(row.cells).indexOf(cell);
+                
+                // Get current rowspan and colspan
+                const currentRowspan = cell.rowSpan || 1;
+                const currentColspan = cell.colSpan || 1;
+                
+                // Remove the cell
+                row.removeChild(cell);
+                
+                // Insert new cells
+                for (let r = 0; r < splitRows; r++) {
+                    for (let c = 0; c < splitCols; c++) {
                         const newCell = document.createElement('td');
+                        newCell.className = 'table-cell';
                         newCell.contentEditable = true;
-                        newCell.innerHTML = '&nbsp;';
+                        newCell.innerHTML = 'Cell ' + (r + 1) + ',' + (c + 1);
                         
-                        // Add voice button to new cell
+                        // Add voice button
                         const voiceBtn = document.createElement('button');
                         voiceBtn.className = 'cell-voice-btn';
                         voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
                         voiceBtn.title = 'Voice input for this cell';
                         voiceBtn.addEventListener('click', (e) => {
                             e.stopPropagation();
-                            currentVoiceTarget = newCell;
+                            saveCursorPosition();
+                            voiceModal.style.display = 'block';
                             startVoiceInput();
                         });
                         newCell.appendChild(voiceBtn);
                         
-                        row.insertBefore(newCell, selectedCell.nextSibling);
+                        // Add selection
+                        newCell.addEventListener('click', (e) => {
+                            if (e.ctrlKey || e.metaKey) {
+                                newCell.classList.toggle('selected');
+                                if (newCell.classList.contains('selected')) {
+                                    if (!selectedCells.includes(newCell)) {
+                                        selectedCells.push(newCell);
+                                    }
+                                } else {
+                                    const index = selectedCells.indexOf(newCell);
+                                    if (index > -1) {
+                                        selectedCells.splice(index, 1);
+                                    }
+                                }
+                            } else {
+                                clearSelections();
+                                newCell.classList.add('selected');
+                                selectedCells = [newCell];
+                            }
+                            e.stopPropagation();
+                        });
+                        
+                        row.insertBefore(newCell, row.cells[cellIndex + c] || null);
                     }
                 }
-            } else {
-                alert('Please select a merged table cell first by clicking on it.');
+                
+                splitModal.style.display = 'none';
+                clearSelections();
             }
         });
 
         // Voice Typing
         function startVoiceInput() {
-            if (!recognition) return;
+            if (!recognition) {
+                initSpeechRecognition();
+            }
             
-            if (isListening) {
-                recognition.stop();
-                isListening = false;
-                voiceStatus.textContent = 'Voice: Ready';
-                voiceBtn.classList.remove('recording');
-            } else {
+            if (recognition) {
                 recognition.start();
                 isListening = true;
-                voiceStatus.textContent = 'Voice: Listening...';
-                voiceBtn.classList.add('recording');
+                voiceStatusText.textContent = 'Recording... Speak now!';
+                voiceStatusText.className = 'voice-status recording';
+                voiceRecord.innerHTML = '<i class="fas fa-stop"></i> Stop Recording';
+                voiceStatus.textContent = 'Voice: Recording';
             }
         }
 
+        function stopVoiceInput() {
+            if (recognition && isListening) {
+                recognition.stop();
+                isListening = false;
+                voiceStatusText.textContent = 'Recording stopped';
+                voiceStatusText.className = 'voice-status';
+                voiceRecord.innerHTML = '<i class="fas fa-microphone"></i> Start Recording';
+                voiceStatus.textContent = 'Voice: Ready';
+            }
+        }
+
+        // Voice button opens permission modal first
         voiceBtn.addEventListener('click', () => {
-            currentVoiceTarget = null;
-            startVoiceInput();
+            permissionModal.style.display = 'block';
         });
 
-        // Global mouse event handlers for dragging and resizing
-        document.addEventListener('mousemove', (e) => {
-            // Handle dragging
-            if (isDragging && dragElement) {
-                const x = e.pageX - dragOffsetX;
-                const y = e.pageY - dragOffsetY;
-                
-                dragElement.style.left = x + 'px';
-                dragElement.style.top = y + 'px';
-            }
-            
-            // Handle resizing
-            if (isResizing && resizeElement) {
-                if (resizeElement.tagName === 'IMG') {
-                    // Image resizing
-                    const dx = e.clientX - startX;
-                    const dy = e.clientY - startY;
-                    
-                    let newWidth = startWidth;
-                    let newHeight = startHeight;
-                    
-                    if (resizeHandle.classList.contains('top-left')) {
-                        newWidth = startWidth - dx;
-                        newHeight = startHeight - dy;
-                    } else if (resizeHandle.classList.contains('top-right')) {
-                        newWidth = startWidth + dx;
-                        newHeight = startHeight - dy;
-                    } else if (resizeHandle.classList.contains('bottom-left')) {
-                        newWidth = startWidth - dx;
-                        newHeight = startHeight + dy;
-                    } else if (resizeHandle.classList.contains('bottom-right')) {
-                        newWidth = startWidth + dx;
-                        newHeight = startHeight + dy;
-                    }
-                    
-                    // Maintain aspect ratio if shift key is pressed
-                    if (e.shiftKey) {
-                        const aspectRatio = startWidth / startHeight;
-                        if (Math.abs(dx) > Math.abs(dy)) {
-                            newHeight = newWidth / aspectRatio;
-                        } else {
-                            newWidth = newHeight * aspectRatio;
-                        }
-                    }
-                    
-                    // Set minimum size
-                    newWidth = Math.max(newWidth, 50);
-                    newHeight = Math.max(newHeight, 50);
-                    
-                    resizeElement.style.width = newWidth + 'px';
-                    resizeElement.style.height = newHeight + 'px';
-                } else if (resizeElement.tagName === 'TABLE') {
-                    // Table column/row resizing
-                    if (resizeHandle.classList.contains('col')) {
-                        const dx = e.clientX - startX;
-                        const tableWidth = resizeElement.offsetWidth;
-                        const newWidth = Math.max(startWidth + (dx / tableWidth) * 100, 5);
-                        
-                        // Update column width
-                        const colIndex = Array.from(resizeElement.querySelectorAll('.resize-handle.col')).indexOf(resizeHandle);
-                        const cols = resizeElement.querySelectorAll('col');
-                        if (cols[colIndex]) {
-                            cols[colIndex].style.width = `${newWidth}%`;
-                            // Adjust the next column
-                            if (cols[colIndex + 1]) {
-                                const nextWidth = parseFloat(cols[colIndex + 1].style.width) || (100 / cols.length);
-                                cols[colIndex + 1].style.width = `${nextWidth - (newWidth - startWidth)}%`;
-                            }
-                        }
-                    } else if (resizeHandle.classList.contains('row')) {
-                        // Table row resizing would be implemented similarly
-                    }
-                }
+        permissionOk.addEventListener('click', () => {
+            permissionModal.style.display = 'none';
+            saveCursorPosition();
+            voiceModal.style.display = 'block';
+            voiceText.textContent = 'Your speech will appear here...';
+        });
+
+        voiceRecord.addEventListener('click', () => {
+            if (isListening) {
+                stopVoiceInput();
+            } else {
+                startVoiceInput();
             }
         });
 
-        document.addEventListener('mouseup', () => {
-            // End dragging
-            if (isDragging) {
-                isDragging = false;
-                document.body.style.userSelect = '';
+        voiceCancel.addEventListener('click', () => {
+            voiceModal.style.display = 'none';
+            stopVoiceInput();
+        });
+
+        voiceInsert.addEventListener('click', () => {
+            const text = voiceText.textContent || voiceText.innerText;
+            if (text && text !== 'Your speech will appear here...') {
+                restoreCursorPosition();
+                insertTextAtCursor(text);
             }
-            
-            // End resizing
-            if (isResizing) {
-                isResizing = false;
-                document.body.style.userSelect = '';
-            }
+            voiceModal.style.display = 'none';
+            stopVoiceInput();
         });
 
         // Helper function to insert text at cursor
@@ -1073,9 +1307,6 @@
                 range.setEndAfter(textNode);
                 selection.removeAllRanges();
                 selection.addRange(range);
-            } else {
-                // If no selection, append to the end
-                editor.innerHTML += text;
             }
             
             updateWordCount();
@@ -1093,15 +1324,38 @@
             }
         }
 
-        // Export Functions (Simplified - in a real app, you would use libraries)
+        // Export Functions - Working implementations
         exportPdfBtn.addEventListener('click', () => {
-            alert('PDF export would be implemented with html2pdf.js in a real application');
-            // This would use html2pdf.js to convert the editor content to PDF
+            // Use html2canvas and jsPDF for PDF export
+            html2canvas(editor).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jspdf.jsPDF();
+                const imgProps = pdf.getImageProperties(imgData);
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+                
+                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                pdf.save('easydocs-document.pdf');
+            });
         });
 
         exportDocxBtn.addEventListener('click', () => {
-            alert('Word export would be implemented with docx.js in a real application');
-            // This would use docx.js to convert the editor content to a Word document
+            // Create a simple DOCX export
+            const content = editor.innerHTML;
+            const blob = new Blob([`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>EasyDocs Document</title>
+                </head>
+                <body>
+                    ${content}
+                </body>
+                </html>
+            `], { type: 'application/msword' });
+            
+            saveAs(blob, 'easydocs-document.doc');
         });
 
         // Word Count
@@ -1118,6 +1372,19 @@
         window.addEventListener('click', (e) => {
             if (e.target === tableModal) {
                 tableModal.style.display = 'none';
+            }
+            if (e.target === splitModal) {
+                splitModal.style.display = 'none';
+            }
+            if (e.target === imageSizeModal) {
+                imageSizeModal.style.display = 'none';
+            }
+            if (e.target === permissionModal) {
+                permissionModal.style.display = 'none';
+            }
+            if (e.target === voiceModal) {
+                voiceModal.style.display = 'none';
+                stopVoiceInput();
             }
         });
     </script>
