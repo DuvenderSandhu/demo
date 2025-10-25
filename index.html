@@ -2,424 +2,1124 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>OCR Document Maker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EasyDocs - Simple Document Editor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            font-family: sans-serif;
-            background-color: #f0f0f0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+        :root {
+            --primary-color: #4a6fa5;
+            --secondary-color: #6b8cbc;
+            --light-color: #f0f4f8;
+            --dark-color: #2c3e50;
+            --accent-color: #e74c3c;
+            --success-color: #2ecc71;
+            --border-radius: 8px;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
             margin: 0;
-            font-size: 18px;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        #container {
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            text-align: center;
-            max-width: 800px;
-            width: 100%;
+
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark-color);
+            line-height: 1.6;
         }
-        h1 {
-            font-size: 28px;
+
+        .container {
+            display: flex;
+            min-height: 100vh;
         }
-        button {
-            font-size: 20px;
-            padding: 10px 20px;
-            margin: 10px;
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Toolbar Styles */
+        .toolbar {
+            background-color: white;
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            box-shadow: var(--shadow);
+        }
+
+        .toolbar-group {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+            padding: 5px;
+            border-right: 1px solid #eee;
+            margin-right: 10px;
+        }
+
+        .toolbar-group:last-child {
+            border-right: none;
+        }
+
+        .toolbar-button {
+            background-color: var(--light-color);
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 12px 15px;
+            font-size: 1rem;
             cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 50px;
+            justify-content: center;
         }
-        #fileInput {
+
+        .toolbar-button:hover {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .toolbar-button.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .toolbar-button.voice {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .toolbar-button.voice.recording {
+            background-color: var(--accent-color);
+            animation: pulse 1.5s infinite;
+        }
+
+        .toolbar-button.export {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        select, input[type="color"] {
+            padding: 8px;
+            border-radius: var(--border-radius);
+            border: 1px solid #ddd;
+            font-size: 1rem;
+        }
+
+        /* Editor Styles */
+        .editor-container {
+            flex: 1;
+            padding: 20px;
+            overflow: auto;
+            position: relative;
+        }
+
+        #editor {
+            background-color: white;
+            min-height: 500px;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            font-size: 1.2rem;
+            line-height: 1.8;
+            outline: none;
+            border: 1px solid #ddd;
+            position: relative;
+        }
+
+        #editor:focus {
+            border-color: var(--primary-color);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 500px;
+            box-shadow: var(--shadow);
+        }
+
+        .modal h2 {
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+
+        .modal-input-group {
+            margin-bottom: 15px;
+        }
+
+        .modal-input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .modal-input-group input {
+            width: 100%;
+            padding: 10px;
+            border-radius: var(--border-radius);
+            border: 1px solid #ddd;
+            font-size: 1rem;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .modal-button.primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .modal-button.secondary {
+            background-color: #ddd;
+            color: var(--dark-color);
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background-color: var(--light-color);
+            padding: 10px 20px;
+            border-top: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* Animation for voice recording */
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* Table Styles */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 10px 0;
+            position: relative;
+            table-layout: fixed;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 8px 12px;
+            text-align: left;
+            position: relative;
+            min-height: 40px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            vertical-align: top;
+        }
+
+        th {
+            background-color: var(--light-color);
+        }
+
+        .selected-cell {
+            background-color: rgba(74, 111, 165, 0.2);
+        }
+
+        .cell-voice-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: var(--success-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: none;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            z-index: 10;
+        }
+
+        td:hover .cell-voice-btn {
+            display: flex;
+        }
+
+        .resize-handle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background-color: var(--primary-color);
+            border: 1px solid white;
+            z-index: 20;
+        }
+
+        .resize-handle.col {
+            top: 0;
+            bottom: 0;
+            width: 6px;
+            cursor: col-resize;
+        }
+
+        .resize-handle.row {
+            left: 0;
+            right: 0;
+            height: 6px;
+            cursor: row-resize;
+        }
+
+        .resize-handle.col::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 1px;
+            right: 1px;
+            height: 20px;
+            margin-top: -10px;
+            background-color: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .resize-handle.row::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 1px;
+            bottom: 1px;
+            width: 20px;
+            margin-left: -10px;
+            background-color: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        /* Image Styles */
+        .editor-image {
+            max-width: 100%;
+            height: auto;
+            margin: 10px 0;
+            position: relative;
+            display: inline-block;
+            cursor: move;
+        }
+
+        .editor-image.selected {
+            outline: 2px solid var(--primary-color);
+        }
+
+        .image-resize-handle {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background-color: var(--primary-color);
+            border: 1px solid white;
+            z-index: 20;
+        }
+
+        .image-resize-handle.top-left {
+            top: -6px;
+            left: -6px;
+            cursor: nwse-resize;
+        }
+
+        .image-resize-handle.top-right {
+            top: -6px;
+            right: -6px;
+            cursor: nesw-resize;
+        }
+
+        .image-resize-handle.bottom-left {
+            bottom: -6px;
+            left: -6px;
+            cursor: nesw-resize;
+        }
+
+        .image-resize-handle.bottom-right {
+            bottom: -6px;
+            right: -6px;
+            cursor: nwse-resize;
+        }
+
+        /* Draggable element styles */
+        .draggable {
+            cursor: move;
+            position: relative;
+        }
+
+        .draggable.selected {
+            outline: 2px dashed var(--primary-color);
+        }
+
+        .drag-handle {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-size: 12px;
+            cursor: move;
+            z-index: 30;
             display: none;
         }
-        #preview {
-            margin: 20px 0;
-            max-height: 300px;
-            overflow: auto;
+
+        .draggable:hover .drag-handle {
+            display: block;
         }
-        #preview img {
-            max-width: 100%;
-        }
-        #textArea {
-            width: 100%;
-            height: 300px;
-            font-size: 18px;
-            padding: 10px;
-            box-sizing: border-box;
-            direction: ltr; /* Adjust if needed for Hindi */
-        }
-        #progress {
-            font-size: 20px;
-            color: green;
-            margin: 10px 0;
-        }
-        label {
-            font-size: 18px;
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .toolbar {
+                justify-content: center;
+            }
+            
+            .toolbar-group {
+                margin-bottom: 10px;
+            }
         }
     </style>
 </head>
 <body>
-    <div id="container">
-        <h1>OCR Document Maker</h1>
-        <button id="uploadBtn">Upload Image or PDF</button>
-        <input type="file" id="fileInput" accept="image/*,application/pdf" multiple>
-        <div id="preview"></div>
-        <label><input type="checkbox" id="thresholdChk"> Apply Thresholding (Optional)</label><br>
-        <label><input type="checkbox" id="psmChk" checked> Use LSTM OCR (Better for Handwriting)</label><br>
-        <button id="ocrBtn">Start OCR</button>
-        <textarea id="textArea" placeholder="Extracted text will appear here..."></textarea>
-        <select id="langSelect">
-            <option value="en-US">English</option>
-            <option value="hi-IN">Hindi</option>
-        </select>
-        <button id="voiceBtn">Voice Typing</button>
-        <button id="convertBtn">Convert Kruti Dev → Unicode</button>
-        <button id="exportPdfBtn">Export as PDF</button>
-        <button id="exportWordBtn">Export as Word (.doc)</button>
-        <div id="progress"></div>
+    <div class="container">
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Toolbar -->
+            <div class="toolbar">
+                <div class="toolbar-group">
+                    <button class="toolbar-button" id="bold-btn" title="Bold"><i class="fas fa-bold"></i></button>
+                    <button class="toolbar-button" id="italic-btn" title="Italic"><i class="fas fa-italic"></i></button>
+                    <button class="toolbar-button" id="underline-btn" title="Underline"><i class="fas fa-underline"></i></button>
+                </div>
+                
+                <div class="toolbar-group">
+                    <button class="toolbar-button" id="font-increase" title="Increase Font Size"><i class="fas fa-search-plus"></i></button>
+                    <button class="toolbar-button" id="font-decrease" title="Decrease Font Size"><i class="fas fa-search-minus"></i></button>
+                </div>
+                
+                <div class="toolbar-group">
+                    <label for="text-color"><i class="fas fa-palette"></i></label>
+                    <input type="color" id="text-color" value="#000000">
+                    <label for="bg-color"><i class="fas fa-fill-drip"></i></label>
+                    <input type="color" id="bg-color" value="#ffffff">
+                </div>
+                
+                <div class="toolbar-group">
+                    <button class="toolbar-button" id="align-left" title="Align Left"><i class="fas fa-align-left"></i></button>
+                    <button class="toolbar-button" id="align-center" title="Align Center"><i class="fas fa-align-center"></i></button>
+                    <button class="toolbar-button" id="align-right" title="Align Right"><i class="fas fa-align-right"></i></button>
+                </div>
+                
+                <div class="toolbar-group">
+                    <button class="toolbar-button" id="insert-image" title="Insert Image"><i class="fas fa-image"></i></button>
+                    <button class="toolbar-button" id="insert-table" title="Insert Table"><i class="fas fa-table"></i></button>
+                </div>
+                
+                <div class="toolbar-group">
+                    <button class="toolbar-button" id="merge-cells" title="Merge Cells"><i class="fas fa-object-group"></i></button>
+                    <button class="toolbar-button" id="split-cells" title="Split Cells"><i class="fas fa-object-ungroup"></i></button>
+                </div>
+                
+                <div class="toolbar-group">
+                    <button class="toolbar-button voice" id="voice-btn" title="Voice Typing"><i class="fas fa-microphone"></i></button>
+                </div>
+                
+                <div class="toolbar-group">
+                    <button class="toolbar-button export" id="export-pdf" title="Export as PDF"><i class="fas fa-file-pdf"></i></button>
+                    <button class="toolbar-button export" id="export-docx" title="Export as Word"><i class="fas fa-file-word"></i></button>
+                </div>
+            </div>
+            
+            <!-- Editor Area -->
+            <div class="editor-container">
+                <div id="editor" contenteditable="true">
+                    <h1>Welcome to EasyDocs</h1>
+                    <p>This is your new document. Start typing here or use the toolbar above to format your text.</p>
+                    <p>You can:</p>
+                    <ul>
+                        <li>Change text style and color</li>
+                        <li>Insert images and tables</li>
+                        <li>Use voice typing</li>
+                        <li>Save your document as PDF or Word file</li>
+                    </ul>
+                    <p>Have fun creating!</p>
+                </div>
+            </div>
+            
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <div id="word-count">Words: 0</div>
+                <div id="voice-status">Voice: Ready</div>
+            </div>
+        </main>
     </div>
-
-    <!-- CDN Scripts -->
-    <script src="https://unpkg.com/tesseract.js@v5.1.1/dist/tesseract.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.7.76/pdf.min.mjs"></script>
-
+    
+    <!-- Table Creation Modal -->
+    <div class="modal" id="table-modal">
+        <div class="modal-content">
+            <h2>Create Table</h2>
+            <div class="modal-input-group">
+                <label for="table-rows">Number of Rows:</label>
+                <input type="number" id="table-rows" min="1" max="20" value="3">
+            </div>
+            <div class="modal-input-group">
+                <label for="table-cols">Number of Columns:</label>
+                <input type="number" id="table-cols" min="1" max="10" value="3">
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-button secondary" id="table-cancel">Cancel</button>
+                <button class="modal-button primary" id="table-insert">Insert Table</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- JavaScript -->
     <script>
-        // Ensure pdf.js worker is set after the script loads
-        document.addEventListener('DOMContentLoaded', () => {
-            if (typeof window.pdfjsLib !== 'undefined') {
-                window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.7.76/pdf.worker.min.mjs';
+        // DOM Elements
+        const editor = document.getElementById('editor');
+        const boldBtn = document.getElementById('bold-btn');
+        const italicBtn = document.getElementById('italic-btn');
+        const underlineBtn = document.getElementById('underline-btn');
+        const fontIncreaseBtn = document.getElementById('font-increase');
+        const fontDecreaseBtn = document.getElementById('font-decrease');
+        const textColor = document.getElementById('text-color');
+        const bgColor = document.getElementById('bg-color');
+        const alignLeftBtn = document.getElementById('align-left');
+        const alignCenterBtn = document.getElementById('align-center');
+        const alignRightBtn = document.getElementById('align-right');
+        const insertImageBtn = document.getElementById('insert-image');
+        const insertTableBtn = document.getElementById('insert-table');
+        const mergeCellsBtn = document.getElementById('merge-cells');
+        const splitCellsBtn = document.getElementById('split-cells');
+        const voiceBtn = document.getElementById('voice-btn');
+        const exportPdfBtn = document.getElementById('export-pdf');
+        const exportDocxBtn = document.getElementById('export-docx');
+        const tableModal = document.getElementById('table-modal');
+        const tableInsertBtn = document.getElementById('table-insert');
+        const tableCancelBtn = document.getElementById('table-cancel');
+        const wordCount = document.getElementById('word-count');
+        const voiceStatus = document.getElementById('voice-status');
+
+        // Speech Recognition
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition = null;
+        let isListening = false;
+        let currentVoiceTarget = null;
+
+        // Dragging state
+        let isDragging = false;
+        let dragElement = null;
+        let dragOffsetX, dragOffsetY;
+
+        // Resizing state
+        let isResizing = false;
+        let resizeElement = null;
+        let resizeHandle = null;
+        let startWidth, startHeight, startX, startY;
+
+        if (SpeechRecognition) {
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
+
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                
+                if (currentVoiceTarget) {
+                    // Insert text into the specific table cell
+                    if (currentVoiceTarget.tagName === 'TD' || currentVoiceTarget.tagName === 'TH') {
+                        currentVoiceTarget.textContent += transcript + ' ';
+                    } else {
+                        // Insert at cursor position in editor
+                        insertTextAtCursor(transcript);
+                    }
+                } else {
+                    // Insert at cursor position in editor
+                    insertTextAtCursor(transcript);
+                }
+                
+                voiceStatus.textContent = 'Voice: Text added';
+                setTimeout(() => {
+                    if (!isListening) voiceStatus.textContent = 'Voice: Ready';
+                }, 2000);
+            };
+
+            recognition.onerror = function(event) {
+                console.error('Speech recognition error', event.error);
+                voiceStatus.textContent = 'Voice: Error';
+                voiceBtn.classList.remove('recording');
+                isListening = false;
+            };
+
+            recognition.onend = function() {
+                voiceBtn.classList.remove('recording');
+                isListening = false;
+                if (voiceStatus.textContent !== 'Voice: Text added') {
+                    voiceStatus.textContent = 'Voice: Ready';
+                }
+            };
+        } else {
+            voiceBtn.disabled = true;
+            voiceBtn.title = 'Speech recognition not supported';
+            voiceStatus.textContent = 'Voice: Not Supported';
+        }
+
+        // Formatting Functions
+        boldBtn.addEventListener('click', () => {
+            document.execCommand('bold', false, null);
+        });
+
+        italicBtn.addEventListener('click', () => {
+            document.execCommand('italic', false, null);
+        });
+
+        underlineBtn.addEventListener('click', () => {
+            document.execCommand('underline', false, null);
+        });
+
+        // Font size controls
+        fontIncreaseBtn.addEventListener('click', () => {
+            document.execCommand('increaseFontSize', false, null);
+        });
+
+        fontDecreaseBtn.addEventListener('click', () => {
+            document.execCommand('decreaseFontSize', false, null);
+        });
+
+        textColor.addEventListener('input', () => {
+            document.execCommand('foreColor', false, textColor.value);
+        });
+
+        bgColor.addEventListener('input', () => {
+            document.execCommand('hiliteColor', false, bgColor.value);
+        });
+
+        alignLeftBtn.addEventListener('click', () => {
+            document.execCommand('justifyLeft', false, null);
+        });
+
+        alignCenterBtn.addEventListener('click', () => {
+            document.execCommand('justifyCenter', false, null);
+        });
+
+        alignRightBtn.addEventListener('click', () => {
+            document.execCommand('justifyRight', false, null);
+        });
+
+        // Insert Image
+        insertImageBtn.addEventListener('click', () => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        const img = document.createElement('img');
+                        img.src = event.target.result;
+                        img.className = 'editor-image draggable';
+                        
+                        // Add resize handles
+                        addImageResizeHandles(img);
+                        
+                        // Add drag handle
+                        addDragHandle(img);
+                        
+                        // Insert at cursor position
+                        insertElementAtCursor(img);
+                        
+                        // Make image draggable
+                        makeElementDraggable(img);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+            
+            input.click();
+        });
+
+        // Add resize handles to image
+        function addImageResizeHandles(img) {
+            const handles = [
+                { position: 'top-left', cursor: 'nwse-resize' },
+                { position: 'top-right', cursor: 'nesw-resize' },
+                { position: 'bottom-left', cursor: 'nesw-resize' },
+                { position: 'bottom-right', cursor: 'nwse-resize' }
+            ];
+            
+            handles.forEach(handle => {
+                const resizeHandle = document.createElement('div');
+                resizeHandle.className = `image-resize-handle ${handle.position}`;
+                resizeHandle.style.cursor = handle.cursor;
+                img.appendChild(resizeHandle);
+                
+                // Add resize functionality
+                makeImageResizable(img, resizeHandle, handle.position);
+            });
+        }
+
+        // Make images resizable
+        function makeImageResizable(img, handle, position) {
+            handle.addEventListener('mousedown', (e) => {
+                isResizing = true;
+                resizeElement = img;
+                resizeHandle = handle;
+                startX = e.clientX;
+                startY = e.clientY;
+                startWidth = parseInt(document.defaultView.getComputedStyle(img).width, 10);
+                startHeight = parseInt(document.defaultView.getComputedStyle(img).height, 10);
+                e.preventDefault();
+                document.body.style.userSelect = 'none';
+            });
+        }
+
+        // Add drag handle to element
+        function addDragHandle(element) {
+            const dragHandle = document.createElement('div');
+            dragHandle.className = 'drag-handle';
+            dragHandle.innerHTML = '<i class="fas fa-arrows-alt"></i>';
+            element.appendChild(dragHandle);
+        }
+
+        // Make elements draggable
+        function makeElementDraggable(element) {
+            element.addEventListener('mousedown', (e) => {
+                // Don't start drag if clicking on resize handle
+                if (e.target.classList.contains('image-resize-handle') || 
+                    e.target.classList.contains('resize-handle')) {
+                    return;
+                }
+                
+                isDragging = true;
+                dragElement = element;
+                dragOffsetX = e.offsetX;
+                dragOffsetY = e.offsetY;
+                
+                // Set position absolute for dragging
+                element.style.position = 'absolute';
+                element.style.zIndex = '1000';
+                document.body.style.userSelect = 'none';
+            });
+        }
+
+        // Insert Table
+        insertTableBtn.addEventListener('click', () => {
+            tableModal.style.display = 'flex';
+        });
+
+        tableCancelBtn.addEventListener('click', () => {
+            tableModal.style.display = 'none';
+        });
+
+        tableInsertBtn.addEventListener('click', () => {
+            const rows = parseInt(document.getElementById('table-rows').value) || 3;
+            const cols = parseInt(document.getElementById('table-cols').value) || 3;
+            
+            const table = document.createElement('table');
+            table.className = 'draggable';
+            
+            // Create column group for consistent column sizing
+            const colgroup = document.createElement('colgroup');
+            for (let j = 0; j < cols; j++) {
+                const col = document.createElement('col');
+                col.style.width = `${100/cols}%`;
+                colgroup.appendChild(col);
+            }
+            table.appendChild(colgroup);
+            
+            for (let i = 0; i < rows; i++) {
+                const tr = document.createElement('tr');
+                for (let j = 0; j < cols; j++) {
+                    const cell = document.createElement('td');
+                    cell.contentEditable = true;
+                    cell.innerHTML = '&nbsp;';
+                    
+                    // Add voice button to each cell
+                    const voiceBtn = document.createElement('button');
+                    voiceBtn.className = 'cell-voice-btn';
+                    voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+                    voiceBtn.title = 'Voice input for this cell';
+                    
+                    voiceBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        currentVoiceTarget = cell;
+                        startVoiceInput();
+                    });
+                    
+                    cell.appendChild(voiceBtn);
+                    tr.appendChild(cell);
+                }
+                table.appendChild(tr);
+            }
+            
+            // Add column resize handles
+            addTableColumnResizeHandles(table);
+            
+            // Add row resize handles
+            addTableRowResizeHandles(table);
+            
+            // Add drag handle
+            addDragHandle(table);
+            
+            // Add table selection functionality
+            table.addEventListener('click', (e) => {
+                if (e.target.tagName === 'TD' || e.target.tagName === 'TH') {
+                    // Clear previous selection
+                    const selected = editor.querySelector('.selected-cell');
+                    if (selected) selected.classList.remove('selected-cell');
+                    
+                    // Select current cell
+                    e.target.classList.add('selected-cell');
+                }
+            });
+            
+            // Make table draggable
+            makeElementDraggable(table);
+            
+            insertElementAtCursor(table);
+            tableModal.style.display = 'none';
+        });
+
+        // Add column resize handles to table
+        function addTableColumnResizeHandles(table) {
+            const cols = table.querySelectorAll('col');
+            
+            cols.forEach((col, index) => {
+                if (index < cols.length - 1) {
+                    const handle = document.createElement('div');
+                    handle.className = 'resize-handle col';
+                    handle.style.right = '0';
+                    table.appendChild(handle);
+                    
+                    // Position the handle between columns
+                    const rect = table.getBoundingClientRect();
+                    const colWidth = rect.width / cols.length;
+                    handle.style.left = `${(index + 1) * colWidth - 3}px`;
+                    
+                    // Add resize functionality
+                    handle.addEventListener('mousedown', (e) => {
+                        isResizing = true;
+                        resizeElement = table;
+                        resizeHandle = handle;
+                        startX = e.clientX;
+                        startWidth = parseFloat(col.style.width) || (100 / cols.length);
+                        e.preventDefault();
+                        document.body.style.userSelect = 'none';
+                    });
+                }
+            });
+        }
+
+        // Add row resize handles to table
+        function addTableRowResizeHandles(table) {
+            const rows = table.querySelectorAll('tr');
+            
+            rows.forEach((row, index) => {
+                if (index < rows.length - 1) {
+                    const handle = document.createElement('div');
+                    handle.className = 'resize-handle row';
+                    handle.style.bottom = '0';
+                    table.appendChild(handle);
+                    
+                    // Position the handle between rows
+                    const rect = table.getBoundingClientRect();
+                    const rowHeight = rect.height / rows.length;
+                    handle.style.top = `${(index + 1) * rowHeight - 3}px`;
+                    
+                    // Add resize functionality
+                    handle.addEventListener('mousedown', (e) => {
+                        isResizing = true;
+                        resizeElement = table;
+                        resizeHandle = handle;
+                        startY = e.clientY;
+                        // For rows, we'll adjust the height of the row
+                        e.preventDefault();
+                        document.body.style.userSelect = 'none';
+                    });
+                }
+            });
+        }
+
+        // Merge and Split Cells
+        mergeCellsBtn.addEventListener('click', () => {
+            const selectedCell = editor.querySelector('.selected-cell');
+            if (selectedCell) {
+                // Simple merge implementation
+                const table = selectedCell.closest('table');
+                if (table) {
+                    const row = selectedCell.parentElement;
+                    const cellIndex = Array.from(row.cells).indexOf(selectedCell);
+                    
+                    // Check if there's a cell to the right to merge with
+                    if (cellIndex < row.cells.length - 1) {
+                        const nextCell = row.cells[cellIndex + 1];
+                        selectedCell.colSpan = (selectedCell.colSpan || 1) + (nextCell.colSpan || 1);
+                        selectedCell.innerHTML += nextCell.innerHTML;
+                        row.removeChild(nextCell);
+                    }
+                }
             } else {
-                console.error('pdf.js failed to load.');
-                document.getElementById('progress').textContent = 'Error: pdf.js not loaded. PDF support disabled.';
+                alert('Please select a table cell first by clicking on it.');
             }
         });
 
-        // Element references
-        const uploadBtn = document.getElementById('uploadBtn');
-        const fileInput = document.getElementById('fileInput');
-        const preview = document.getElementById('preview');
-        const ocrBtn = document.getElementById('ocrBtn');
-        const textArea = document.getElementById('textArea');
-        const convertBtn = document.getElementById('convertBtn');
-        const exportPdfBtn = document.getElementById('exportPdfBtn');
-        const exportWordBtn = document.getElementById('exportWordBtn');
-        const voiceBtn = document.getElementById('voiceBtn');
-        const langSelect = document.getElementById('langSelect');
-        const thresholdChk = document.getElementById('thresholdChk');
-        const psmChk = document.getElementById('psmChk');
-        const progress = document.getElementById('progress');
-
-        // Canvas for image processing
-        let canvas = document.createElement('canvas');
-        let ctx = canvas.getContext('2d');
-        let currentCanvases = []; // Array to hold canvases for multi-page
-
-        // Upload button triggers file input
-        uploadBtn.onclick = () => fileInput.click();
-
-        // Handle file upload (support multiple for multi-page PDFs)
-        fileInput.onchange = async (e) => {
-            const files = e.target.files;
-            if (!files || files.length === 0) {
-                progress.textContent = 'No file selected.';
-                return;
-            }
-            preview.innerHTML = '';
-            currentCanvases = [];
-            progress.textContent = 'Loading file(s)...';
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                const url = URL.createObjectURL(file);
-                if (file.type === 'application/pdf') {
-                    await loadPdf(url);
-                } else if (file.type.startsWith('image/')) {
-                    await loadImage(url);
-                } else {
-                    progress.textContent += ` Unsupported file type for ${file.name}.`;
+        splitCellsBtn.addEventListener('click', () => {
+            const selectedCell = editor.querySelector('.selected-cell');
+            if (selectedCell && selectedCell.colSpan > 1) {
+                // Simple split implementation
+                const table = selectedCell.closest('table');
+                if (table) {
+                    const row = selectedCell.parentElement;
+                    const cellIndex = Array.from(row.cells).indexOf(selectedCell);
+                    
+                    // Split the cell
+                    const colSpan = selectedCell.colSpan;
+                    selectedCell.colSpan = 1;
+                    
+                    // Add additional cells
+                    for (let i = 1; i < colSpan; i++) {
+                        const newCell = document.createElement('td');
+                        newCell.contentEditable = true;
+                        newCell.innerHTML = '&nbsp;';
+                        
+                        // Add voice button to new cell
+                        const voiceBtn = document.createElement('button');
+                        voiceBtn.className = 'cell-voice-btn';
+                        voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+                        voiceBtn.title = 'Voice input for this cell';
+                        voiceBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            currentVoiceTarget = newCell;
+                            startVoiceInput();
+                        });
+                        newCell.appendChild(voiceBtn);
+                        
+                        row.insertBefore(newCell, selectedCell.nextSibling);
+                    }
                 }
+            } else {
+                alert('Please select a merged table cell first by clicking on it.');
             }
-            progress.textContent = 'Files loaded.';
-        };
+        });
 
-        // Load image to canvas and preview
-        function loadImage(url) {
-            return new Promise((resolve) => {
-                const img = new Image();
-                img.onload = () => {
-                    canvas = document.createElement('canvas');
-                    canvas.width = img.width;
-                    canvas.height = img.height;
-                    ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0);
-                    currentCanvases.push(canvas);
-                    const previewImg = new Image();
-                    previewImg.src = url;
-                    preview.appendChild(previewImg);
-                    resolve();
-                };
-                img.onerror = () => {
-                    progress.textContent += ' Error loading image.';
-                    resolve();
-                };
-                img.src = url;
-            });
-        }
-
-        // Load PDF to canvases (multi-page support) and preview
-        async function loadPdf(url) {
-            if (typeof window.pdfjsLib === 'undefined') {
-                progress.textContent = 'PDF support not available.';
-                return;
-            }
-            const loadingTask = window.pdfjsLib.getDocument(url);
-            const pdf = await loadingTask.promise;
-            for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-                const page = await pdf.getPage(pageNum);
-                const scale = 2.0; // Higher scale for better OCR accuracy
-                const viewport = page.getViewport({ scale });
-                canvas = document.createElement('canvas');
-                canvas.width = viewport.width;
-                canvas.height = viewport.height;
-                ctx = canvas.getContext('2d');
-                const renderContext = { canvasContext: ctx, viewport };
-                await page.render(renderContext).promise;
-                currentCanvases.push(canvas);
-                const previewImg = new Image();
-                previewImg.src = canvas.toDataURL();
-                preview.appendChild(previewImg);
-                preview.innerHTML += `<p>Page ${pageNum}</p>`;
-            }
-        }
-
-        // OCR processing (multi-page support)
-        ocrBtn.onclick = async () => {
-            if (currentCanvases.length === 0) {
-                alert('Please upload an image or PDF first.');
-                return;
-            }
-            let fullText = '';
-            progress.textContent = 'Initializing OCR...';
-            const worker = await Tesseract.createWorker({
-                logger: m => progress.textContent = `${m.status}: ${Math.round(m.progress * 100)}%`,
-            });
-            await worker.load();
-            await worker.loadLanguage('eng+hin');
-            await worker.initialize('eng+hin');
-            if (psmChk.checked) {
-                await worker.setParameters({ tessedit_pageseg_mode: '1' }); // PSM 1: Automatic page segmentation with OSD (better for handwriting)
-            }
-            for (let i = 0; i < currentCanvases.length; i++) {
-                progress.textContent = `Preprocessing page ${i+1}...`;
-                preprocessCanvas(currentCanvases[i]);
-                progress.textContent = `Recognizing page ${i+1}...`;
-                const { data: { text } } = await worker.recognize(currentCanvases[i]);
-                fullText += text + '\n\n--- Page ' + (i+1) + ' ---\n\n';
-            }
-            textArea.value = fullText;
-            await worker.terminate();
-            progress.textContent = 'OCR completed.';
-        };
-
-        // Image preprocessing per canvas
-        function preprocessCanvas(canvas) {
-            const ctx = canvas.getContext('2d');
-            // Grayscale
-            let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            let data = imageData.data;
-            for (let i = 0; i < data.length; i += 4) {
-                let gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
-                data[i] = data[i + 1] = data[i + 2] = gray;
-            }
-            ctx.putImageData(imageData, 0, 0);
-
-            // Increase contrast
-            imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            data = imageData.data;
-            const factor = 2.0; // Higher contrast for handwriting
-            for (let i = 0; i < data.length; i += 4) {
-                for (let j = 0; j < 3; j++) {
-                    let val = ((data[i + j] / 255 - 0.5) * factor + 0.5) * 255;
-                    data[i + j] = Math.min(255, Math.max(0, val));
-                }
-            }
-            ctx.putImageData(imageData, 0, 0);
-
-            // Optional thresholding
-            if (thresholdChk.checked) {
-                imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                data = imageData.data;
-                for (let i = 0; i < data.length; i += 4) {
-                    let gray = data[i];
-                    let val = gray > 128 ? 255 : 0;
-                    data[i] = data[i + 1] = data[i + 2] = val;
-                }
-                ctx.putImageData(imageData, 0, 0);
-            }
-        }
-
-        // Kruti Dev to Unicode conversion (unchanged)
-        convertBtn.onclick = () => {
-            textArea.value = krutiToUnicode(textArea.value);
-            progress.textContent = 'Converted to Unicode.';
-        };
-
-        function krutiToUnicode(text) {
-            text += ' ';
-            text = text.replace(/([कखगघचछजझञटठडढणतथदधनपफबभमयरलवशषसहक़ख़ग़ज़ड़ढ़फ़य़ळ])([\u0901])/g, "$2$1");
-            text = text.replace(/([कखगघचछजझञटठडढणतथदधनपफबभमयरलवशषसहक़ख़ग़ज़ड़ढ़फ़य़ळ])([\u0902])/g, "$2$1");
-            text = text.replace(/([कखगघचछजझञटठडढणतथदधनपफबभमयरलवशषसहक़ख़ग़ज़ड़ढ़फ़य़ळ])(ं)/g, "ं$1");
-            text = text.replace(/([कखगघचछजझञटठडढणतथदधनपफबभमयरलवशषसहक़ख़ग़ज़ड़ढ़फ़य़ळ])(ॅ)/g, "ॅ$1");
-            text = text.replace(/([कखगघचछजझञटठडढणतथदधनपफबभमयरलवशषसहक़ख़ग़ज़ड़ढ़फ़य़ळ])(ॉ)/g, "ॉ$1");
-            text = text.replace(/([कखगघचछजझञटठडढणतथदधनपफबभमयरलवशषसहक़ख़ग़ज़ड़ढ़फ़य़ळ])ा/g, "ा$1");
-            text = text.replace(/([कखगघचछजझञटठडढणतथदधनपफबभमयरलवशषसहक़ख़ग़ज़ड़ढ़फ़य़ळ])ि/g, "ि$1");
-            text = text.replace(/([कखगघचछजझञटठडढणतथदधनपफबभमयरलवशषसहक़ख़ग़ज़ड़ढ़फ़य़ळ])ी/g, "ी$1");
-            text = text.replace(/([कखगघचछजझञटठडढणतथदधनपफबभमयरलवशषसहक़ख़ग़ज़ड़ढ़फ़य़ळ])ु/g, "ु$1");
-            text = text.replace(/([कखगघचछजझञटठडढणतथदधनपफबभमयरलवशषसहक़ख़ग़ज़ड़ढ़फ़य़ळ])ू/g, "ू$1");
-            text = text.replace(/([कखगघचछजझञटठडढणतथदधनपफबभमयरलवशषसहक़ख़ग़ज़ड़ढ़फ़य़ळ])ृ/g, "ृ$1");
-            text = text.replace(/([कखगघचछजझञटठडढणतथदधनपफबभमयरलवशषसहक़ख़ग़ज़ड़ढ़फ़य़ळ])े/g, "े$1");
-            text = text.replace(/([कखगघचछजझञटठडढणतथदधनपफबभमयरलवशषसहक़ख़ग़ज़ड़ढ़फ़य़ळ])ै/g, "ै$1");
-            text = text.replace(/([कखगघचछजझञटठडढणतथदधनपफबभमयरलवशषसहक़ख़ग़ज़ड़ढ़फ़य़ळ])ो/g, "ो$1");
-            text = text.replace(/([कखगघचछजझञटठडढणतथदधनपफबभमयरलवशषसहक़ख़ग़ज़ड़ढ़फ़य़ळ])ौ/g, "ौ$1");
-
-            text = text.replace(/É/g, 'क़');
-            text = text.replace(/ç/g, 'फ़');
-            text = text.replace(/ƒ/g, 'ज़');
-            text = text.replace(/˜/g, 'ख़');
-            text = text.replace(/×/g, 'ग़');
-            text = text.replace(/Ä/g, 'ढ़');
-            text = text.replace(/Æ/g, 'झ़');
-            text = text.replace(/È/g, 'क़');
-            text = text.replace(//g, 'ड़');
-            text = text.replace(/Ñ/g, 'ळ');
-            text = text.replace(/Ê/g, 'क्ष');
-            text = text.replace(/ë/g, 'त्र');
-            text = text.replace(//g, 'ज्ञ');
-            text = text.replace(/„/g, 'श्र');
-            text = text.replace(/A/g, 'अ');
-            text = text.replace(/B/g, 'आ');
-            text = text.replace(/C/g, 'इ');
-            text = text.replace(/D/g, 'ई');
-            text = text.replace(/E/g, 'उ');
-            text = text.replace(/F/g, 'ऊ');
-            text = text.replace(/G/g, 'ऋ');
-            text = text.replace(/H/g, 'ऌ');
-            text = text.replace(/I/g, 'ऍ');
-            text = text.replace(/J/g, 'ऐ');
-            text = text.replace(/K/g, 'ऑ');
-            text = text.replace(/L/g, 'ओ');
-            text = text.replace(/M/g, 'औ');
-            text = text.replace(/N/g, 'अं');
-            text = text.replace(/O/g, 'अः');
-            text = text.replace(/0/g, '०');
-            text = text.replace(/1/g, '१');
-            text = text.replace(/2/g, '२');
-            text = text.replace(/3/g, '३');
-            text = text.replace(/4/g, '४');
-            text = text.replace(/5/g, '५');
-            text = text.replace(/6/g, '६');
-            text = text.replace(/7/g, '७');
-            text = text.replace(/8/g, '८');
-            text = text.replace(/9/g, '९');
-
-            text = text.trim();
-            return text;
-        }
-
-        // Export as PDF (multi-page, preserve layout by adding images)
-        exportPdfBtn.onclick = () => {
-            if (!textArea.value && currentCanvases.length === 0) {
-                alert('No content to export.');
-                return;
-            }
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            const imgWidth = 180;
-            const pageHeight = doc.internal.pageSize.height - 20;
-            let yPos = 10;
-            const lines = textArea.value.split('\n');
-            let pageIndex = 0;
-
-            // Add OCR text
-            for (let line of lines) {
-                if (yPos > pageHeight) {
-                    doc.addPage();
-                    yPos = 10;
-                }
-                doc.text(line, 10, yPos);
-                yPos += 7; // Line height
-            }
-
-            // Add original images to preserve design (append pages)
-            for (let canvas of currentCanvases) {
-                if (pageIndex > 0 || textArea.value) doc.addPage();
-                const imgData = canvas.toDataURL('image/png');
-                doc.addImage(imgData, 'PNG', 10, 10, imgWidth, (canvas.height / canvas.width) * imgWidth);
-                pageIndex++;
-            }
-            doc.save('document.pdf');
-            progress.textContent = 'PDF exported with original design.';
-        };
-
-        // Export as Word (.doc) - Basic text, note: .doc doesn't support images easily, so text only
-        exportWordBtn.onclick = () => {
-            if (!textArea.value) {
-                alert('No text to export.');
-                return;
-            }
-            const blob = new Blob([textArea.value], { type: 'application/msword' });
-            saveAs(blob, 'document.doc');
-            progress.textContent = 'Word document exported (text only; for design, use PDF).';
-        };
-
-        // Voice typing (unchanged)
-        let recognition = null;
-        voiceBtn.onclick = () => {
-            if (!('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) {
-                alert('Web Speech API not supported in this browser.');
-                return;
-            }
-            if (recognition) {
+        // Voice Typing
+        function startVoiceInput() {
+            if (!recognition) return;
+            
+            if (isListening) {
                 recognition.stop();
-                recognition = null;
-                voiceBtn.textContent = 'Voice Typing';
-                progress.textContent = 'Voice typing stopped.';
-                return;
+                isListening = false;
+                voiceStatus.textContent = 'Voice: Ready';
+                voiceBtn.classList.remove('recording');
+            } else {
+                recognition.start();
+                isListening = true;
+                voiceStatus.textContent = 'Voice: Listening...';
+                voiceBtn.classList.add('recording');
             }
-            recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-            recognition.lang = langSelect.value;
-            recognition.interimResults = true;
-            recognition.onresult = (event) => {
-                let transcript = '';
-                for (let i = event.resultIndex; i < event.results.length; i++) {
-                    transcript += event.results[i][0].transcript;
-                }
-                insertTextAtCursor(transcript);
-            };
-            recognition.onerror = (event) => {
-                progress.textContent = 'Voice error: ' + event.error;
-            };
-            recognition.onend = () => {
-                recognition = null;
-                voiceBtn.textContent = 'Voice Typing';
-                progress.textContent = 'Voice typing stopped.';
-            };
-            recognition.start();
-            voiceBtn.textContent = 'Stop Voice Typing';
-            progress.textContent = 'Voice typing started...';
-        };
-
-        function insertTextAtCursor(text) {
-            const start = textArea.selectionStart;
-            const end = textArea.selectionEnd;
-            textArea.value = textArea.value.substring(0, start) + text + textArea.value.substring(end);
-            textArea.selectionStart = textArea.selectionEnd = start + text.length;
-            textArea.focus();
         }
+
+        voiceBtn.addEventListener('click', () => {
+            currentVoiceTarget = null;
+            startVoiceInput();
+        });
+
+        // Global mouse event handlers for dragging and resizing
+        document.addEventListener('mousemove', (e) => {
+            // Handle dragging
+            if (isDragging && dragElement) {
+                const x = e.pageX - dragOffsetX;
+                const y = e.pageY - dragOffsetY;
+                
+                dragElement.style.left = x + 'px';
+                dragElement.style.top = y + 'px';
+            }
+            
+            // Handle resizing
+            if (isResizing && resizeElement) {
+                if (resizeElement.tagName === 'IMG') {
+                    // Image resizing
+                    const dx = e.clientX - startX;
+                    const dy = e.clientY - startY;
+                    
+                    let newWidth = startWidth;
+                    let newHeight = startHeight;
+                    
+                    if (resizeHandle.classList.contains('top-left')) {
+                        newWidth = startWidth - dx;
+                        newHeight = startHeight - dy;
+                    } else if (resizeHandle.classList.contains('top-right')) {
+                        newWidth = startWidth + dx;
+                        newHeight = startHeight - dy;
+                    } else if (resizeHandle.classList.contains('bottom-left')) {
+                        newWidth = startWidth - dx;
+                        newHeight = startHeight + dy;
+                    } else if (resizeHandle.classList.contains('bottom-right')) {
+                        newWidth = startWidth + dx;
+                        newHeight = startHeight + dy;
+                    }
+                    
+                    // Maintain aspect ratio if shift key is pressed
+                    if (e.shiftKey) {
+                        const aspectRatio = startWidth / startHeight;
+                        if (Math.abs(dx) > Math.abs(dy)) {
+                            newHeight = newWidth / aspectRatio;
+                        } else {
+                            newWidth = newHeight * aspectRatio;
+                        }
+                    }
+                    
+                    // Set minimum size
+                    newWidth = Math.max(newWidth, 50);
+                    newHeight = Math.max(newHeight, 50);
+                    
+                    resizeElement.style.width = newWidth + 'px';
+                    resizeElement.style.height = newHeight + 'px';
+                } else if (resizeElement.tagName === 'TABLE') {
+                    // Table column/row resizing
+                    if (resizeHandle.classList.contains('col')) {
+                        const dx = e.clientX - startX;
+                        const tableWidth = resizeElement.offsetWidth;
+                        const newWidth = Math.max(startWidth + (dx / tableWidth) * 100, 5);
+                        
+                        // Update column width
+                        const colIndex = Array.from(resizeElement.querySelectorAll('.resize-handle.col')).indexOf(resizeHandle);
+                        const cols = resizeElement.querySelectorAll('col');
+                        if (cols[colIndex]) {
+                            cols[colIndex].style.width = `${newWidth}%`;
+                            // Adjust the next column
+                            if (cols[colIndex + 1]) {
+                                const nextWidth = parseFloat(cols[colIndex + 1].style.width) || (100 / cols.length);
+                                cols[colIndex + 1].style.width = `${nextWidth - (newWidth - startWidth)}%`;
+                            }
+                        }
+                    } else if (resizeHandle.classList.contains('row')) {
+                        // Table row resizing would be implemented similarly
+                    }
+                }
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            // End dragging
+            if (isDragging) {
+                isDragging = false;
+                document.body.style.userSelect = '';
+            }
+            
+            // End resizing
+            if (isResizing) {
+                isResizing = false;
+                document.body.style.userSelect = '';
+            }
+        });
+
+        // Helper function to insert text at cursor
+        function insertTextAtCursor(text) {
+            const selection = window.getSelection();
+            if (selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                range.deleteContents();
+                const textNode = document.createTextNode(text);
+                range.insertNode(textNode);
+                range.setStartAfter(textNode);
+                range.setEndAfter(textNode);
+                selection.removeAllRanges();
+                selection.addRange(range);
+            } else {
+                // If no selection, append to the end
+                editor.innerHTML += text;
+            }
+            
+            updateWordCount();
+        }
+
+        // Helper function to insert element at cursor
+        function insertElementAtCursor(element) {
+            const selection = window.getSelection();
+            if (selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                range.deleteContents();
+                range.insertNode(element);
+            } else {
+                editor.appendChild(element);
+            }
+        }
+
+        // Export Functions (Simplified - in a real app, you would use libraries)
+        exportPdfBtn.addEventListener('click', () => {
+            alert('PDF export would be implemented with html2pdf.js in a real application');
+            // This would use html2pdf.js to convert the editor content to PDF
+        });
+
+        exportDocxBtn.addEventListener('click', () => {
+            alert('Word export would be implemented with docx.js in a real application');
+            // This would use docx.js to convert the editor content to a Word document
+        });
+
+        // Word Count
+        function updateWordCount() {
+            const text = editor.innerText || '';
+            const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+            wordCount.textContent = `Words: ${words}`;
+        }
+
+        editor.addEventListener('input', updateWordCount);
+        updateWordCount();
+
+        // Close modal when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === tableModal) {
+                tableModal.style.display = 'none';
+            }
+        });
     </script>
 </body>
 </html>
