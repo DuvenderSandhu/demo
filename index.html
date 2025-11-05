@@ -2,60 +2,36 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Google-style Hindi Transliteration</title>
-<script src="https://cdn.jsdelivr.net/npm/sanscript@0.0.2/index.min.js"></script>
+<title>AI4Bharat Hindi Transliteration Box</title>
+<script src="https://cdn.jsdelivr.net/npm/@ai4bharat/indic-transliterate@1.3.8/dist/index.min.js"></script>
 <style>
   body {
-    font-size: 22px;
-    padding: 40px;
     font-family: Arial, sans-serif;
+    padding: 40px;
+    font-size: 20px;
   }
-  textarea {
-    width: 100%;
-    max-width: 700px;
-    height: 140px;
+  .input-box {
     font-size: 22px;
-    padding: 10px;
-  }
-  #output {
-    font-size: 26px;
-    margin-top: 20px;
-    border: 1px solid #ccc;
-    padding: 15px;
-    min-height: 80px;
-    background-color: #fafafa;
-    line-height: 1.5;
+    width: 500px;
+    padding: 8px;
   }
 </style>
 </head>
 <body>
 
-<h2>Google-Style Hindi Input (Offline)</h2>
+<h2>Transliteration with Suggestion Box (like Google Input)</h2>
 
-<textarea id="input" placeholder="Type Roman Hindi..."></textarea>
-<div id="output"></div>
+<!-- Input box where AI4Bharat adds suggestion dropdown -->
+<input id="input" class="input-box" placeholder="Type Roman Hindi..." />
 
 <script>
-const input = document.getElementById("input");
-const output = document.getElementById("output");
-
-let lastWord = "";
-let hindiText = "";
-
-input.addEventListener("input", () => {
-  const value = input.value;
-  const words = value.split(/\s+/); // split on space
-
-  // last typed word (Roman)
-  const currentWord = words[words.length - 1];
-
-  // transliterate only the current word
-  const transliterated = Sanscript.t(currentWord, "itrans", "devanagari");
-
-  // combine: all previous words + transliterated last word
-  const combined = [...words.slice(0, -1), transliterated].join(" ");
-  output.textContent = combined;
-});
+  // Initialize the transliteration box
+  IndicTransliterate.init({
+    lang: "hi",
+    inputElement: document.getElementById("input"),
+    showSuggestions: true, // enables the popup box
+    showCurrentWord: true  // shows transliteration as you type
+  });
 </script>
 
 </body>
