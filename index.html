@@ -1,39 +1,66 @@
-<html>
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <script type="text/javascript" src="https://www.google.com/jsapi">
-    </script>
-    <script type="text/javascript">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>English to Hindi Typing (Google Transliteration)</title>
 
-      // Load the Google Transliterate API
-      google.load("elements", "1", {
-            packages: "transliteration"
-          });
+  <!-- jQuery (optional, but loaded in your example) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
-      function onLoad() {
-        var options = {
-            sourceLanguage:
-                google.elements.transliteration.LanguageCode.ENGLISH,
-            destinationLanguage:
-                [google.elements.transliteration.LanguageCode.HINDI],
-            shortcutKey: 'ctrl+g',
-            transliterationEnabled: true
-        };
+  <!-- Load Google Transliteration API -->
+  <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 
-        // Create an instance on TransliterationControl with the required
-        // options.
-        var control =
-            new google.elements.transliteration.TransliterationControl(options);
+  <script type="text/javascript">
+    // Load Google Transliteration API
+    google.load("elements", "1", { packages: "transliteration" });
 
-        // Enable transliteration in the textbox with id
-        // 'transliterateTextarea'.
-        control.makeTransliteratable(['transliterateTextarea']);
-      }
-      google.setOnLoadCallback(onLoad);
-    </script>
-  </head>
-  <body>
-    Type in Hindi (Press Ctrl+g to toggle between English and Hindi)<br>
-    <textarea id="transliterateTextarea" style="width:600px;height:200px"></textarea>
-  </body>
-</html> 
+    function onLoad() {
+      // Configuration options
+      var options = {
+        sourceLanguage: 'en',
+        destinationLanguage: ['hi', 'gu', 'ml', 'kn', 'ta', 'te'], // Hindi + Indian languages
+        shortcutKey: 'ctrl+m',
+        transliterationEnabled: true
+      };
+
+      // Create the transliteration control
+      var control = new google.elements.transliteration.TransliterationControl(options);
+
+      // IDs of fields to make transliteratable
+      var ids = ["language"];
+      control.makeTransliteratable(ids);
+
+      // Show the language toggle dropdown
+      control.showControl('translControl');
+    }
+
+    // Initialize on load
+    google.setOnLoadCallback(onLoad);
+  </script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 40px;
+      background: #fafafa;
+    }
+    textarea {
+      width: 600px;
+      height: 100px;
+      padding: 10px;
+      font-size: 18px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      outline: none;
+    }
+    #translControl {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Type in English → Get Hindi (Ctrl + M to toggle)</h2>
+  <textarea id="language" placeholder="Type here..."></textarea>
+  <div id="translControl"></div>
+</body>
+</html>
