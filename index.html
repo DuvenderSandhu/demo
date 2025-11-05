@@ -1,66 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>English to Hindi Typing (Google Transliteration)</title>
-
-  <!-- jQuery (optional, but loaded in your example) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-
-  <!-- Load Google Transliteration API -->
-  <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-
-  <script type="text/javascript">
-    // Load Google Transliteration API
-    google.load("elements", "1", { packages: "transliteration" });
-
-    function onLoad() {
-      // Configuration options
-      var options = {
-        sourceLanguage: 'en',
-        destinationLanguage: ['hi', 'gu', 'ml', 'kn', 'ta', 'te'], // Hindi + Indian languages
-        shortcutKey: 'ctrl+m',
-        transliterationEnabled: true
-      };
-
-      // Create the transliteration control
-      var control = new google.elements.transliteration.TransliterationControl(options);
-
-      // IDs of fields to make transliteratable
-      var ids = ["language"];
-      control.makeTransliteratable(ids);
-
-      // Show the language toggle dropdown
-      control.showControl('translControl');
-    }
-
-    // Initialize on load
-    google.setOnLoadCallback(onLoad);
-  </script>
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 40px;
-      background: #fafafa;
-    }
-    textarea {
-      width: 600px;
-      height: 100px;
-      padding: 10px;
-      font-size: 18px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      outline: none;
-    }
-    #translControl {
-      margin-top: 10px;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Hindi Transliteration - Sanscript</title>
+<script src="https://cdn.jsdelivr.net/npm/sanscript@0.0.2/index.min.js"></script>
+<style>
+  body {
+    font-size: 22px;
+    padding: 40px;
+    font-family: Arial, sans-serif;
+  }
+  input, textarea {
+    font-size: 22px;
+    width: 100%;
+    max-width: 600px;
+    padding: 8px;
+  }
+  #output {
+    font-size: 26px;
+    margin-top: 20px;
+    color: #222;
+    border: 1px solid #ccc;
+    padding: 10px;
+    min-height: 50px;
+  }
+</style>
 </head>
 <body>
-  <h2>Type in English → Get Hindi (Ctrl + M to toggle)</h2>
-  <textarea id="language" placeholder="Type here..."></textarea>
-  <div id="translControl"></div>
+
+<h2>Type Roman Hindi → Get Devanagari (Auto Transliteration)</h2>
+
+<textarea id="input" rows="4" placeholder="Type Roman Hindi..."></textarea>
+<div id="output"></div>
+
+<script>
+  const input = document.getElementById("input");
+  const output = document.getElementById("output");
+
+  // Run transliteration every time input changes
+  input.addEventListener("input", () => {
+    const roman = input.value.trim();
+    const devanagari = Sanscript.t(roman, "itrans", "devanagari");
+    output.textContent = devanagari;
+  });
+
+  // Optional: also update on blur/change if you prefer onchange specifically
+  input.addEventListener("change", () => {
+    const roman = input.value.trim();
+    const devanagari = Sanscript.t(roman, "itrans", "devanagari");
+    output.textContent = devanagari;
+  });
+</script>
+
 </body>
 </html>
